@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Scorio - نتائج مباريات كرة القدم</title>
+  <meta name="description" content="نتائج مباريات كرة القدم اليوم مباشر - جميع الدوريات والبطولات العالمية">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body data-page="matches">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="hdr-icons">
+      <button class="hdr-btn" id="btn-menu" title="القائمة">&#9776;</button>
+    </div>
+    <div class="logo">Scorio <span>&#9917;</span></div>
+    <div class="hdr-icons">
+      <button class="hdr-btn" id="btn-cal" title="اختر تاريخ">&#128197;</button>
+    </div>
+  </header>
+
+  <!-- Status Tabs -->
+  <div class="status-tabs">
+    <button class="status-tab active" data-filter="all">الكل</button>
+    <button class="status-tab" data-filter="live">مباشر <span class="live-badge hidden" id="live-count">0</span></button>
+    <button class="status-tab" data-filter="pre">القادمة</button>
+    <button class="status-tab" data-filter="post">انتهت</button>
+  </div>
+
+  <!-- Date Pill (single) -->
+  <div class="date-single-bar">
+    <button class="date-nav-btn" id="btn-prev-day">&#8250;</button>
+    <button class="date-single-pill" id="btn-date-display">
+      <span id="date-label-text">اليوم</span>
+      <span class="date-cal-icon">&#128197;</span>
+    </button>
+    <button class="date-nav-btn" id="btn-next-day">&#8249;</button>
+  </div>
+
+  <!-- Matches -->
+  <div class="matches-list" id="matches-container">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <div>جارٍ تحميل المباريات...</div>
+    </div>
+  </div>
+
+  <!-- Date Picker Modal -->
+  <div class="date-modal-overlay hidden" id="date-modal">
+    <div class="date-modal">
+      <h3>اختر تاريخاً</h3>
+      <div class="selects">
+        <select id="pick-day"></select>
+        <select id="pick-month">
+          <option value="01">يناير</option><option value="02">فبراير</option>
+          <option value="03">مارس</option><option value="04">أبريل</option>
+          <option value="05">مايو</option><option value="06">يونيو</option>
+          <option value="07">يوليو</option><option value="08">أغسطس</option>
+          <option value="09">سبتمبر</option><option value="10">أكتوبر</option>
+          <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
+        </select>
+        <select id="pick-year"></select>
+      </div>
+      <div class="modal-btns">
+        <button class="modal-btn primary" id="btn-apply-date">عرض</button>
+        <button class="modal-btn secondary" id="btn-close-modal">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Refresh Bar -->
+  <div class="refresh-bar" id="refresh-bar">
+    <span class="refresh-dot"></span> يتجدد تلقائياً
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="bn-item active">
+      <span class="bn-icon">&#9917;</span>
+      <span>المباريات</span>
+    </button>
+    <button class="bn-item" onclick="location.href='/fixtures.html'">
+      <span class="bn-icon">&#128197;</span>
+      <span>المواعيد</span>
+    </button>
+  </nav>
+
+  <script src="/assets/js/app.js"></script>
+</body>
+</html>
