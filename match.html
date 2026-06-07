@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>تفاصيل المباراة - Scorio</title>
+  <meta name="description" content="تفاصيل المباراة - أهداف وإحصائيات وتشكيلات">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body data-page="match">
+
+  <!-- Header -->
+  <header class="page-header">
+    <button class="back-btn" onclick="history.back()">&#8594;</button>
+    <div class="ph-title">Scorio</div>
+    <div class="ph-icons">
+      <button class="hdr-btn">&#128276;</button>
+      <button class="hdr-btn">&#8942;</button>
+    </div>
+  </header>
+
+  <!-- Breadcrumb (filled by JS) -->
+  <div class="breadcrumb" id="breadcrumb"></div>
+
+  <!-- Match Hero (filled by JS) -->
+  <div id="match-hero"></div>
+
+  <!-- Detail Tabs -->
+  <div class="detail-tabs" id="detail-tabs" style="display:none">
+    <button class="detail-tab active" data-tab="details">التفاصيل</button>
+    <button class="detail-tab" data-tab="lineup">التشكيلات</button>
+    <button class="detail-tab" data-tab="stats">الإحصائيات</button>
+    <button class="detail-tab" data-tab="events">الأحداث</button>
+  </div>
+
+  <!-- Tab Panels -->
+  <div id="tab-details"  class="tab-panel active"></div>
+  <div id="tab-lineup"   class="tab-panel"></div>
+  <div id="tab-stats"    class="tab-panel"></div>
+  <div id="tab-events"   class="tab-panel"></div>
+
+  <!-- Refresh Bar -->
+  <div class="refresh-bar" id="refresh-bar">
+    <span class="refresh-dot"></span> يتجدد تلقائياً
+  </div>
+
+  <script src="/assets/js/app.js"></script>
+</body>
+</html>
