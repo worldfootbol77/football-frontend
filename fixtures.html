@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>المباريات القادمة - Scorio</title>
+  <meta name="description" content="جدول المباريات القادمة في جميع الدوريات والبطولات العالمية">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body data-page="fixtures">
+
+  <header class="page-header">
+    <button class="back-btn" onclick="location.href='/'">&#8594;</button>
+    <div class="ph-title">المباريات القادمة</div>
+    <div class="ph-icons"></div>
+  </header>
+
+  <div id="fixtures-container">
+    <div class="loading-spinner"><div class="spinner"></div><div>جارٍ التحميل...</div></div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="bn-item" onclick="location.href='/'">
+      <span class="bn-icon">&#9917;</span>
+      <span>المباريات</span>
+    </button>
+    <button class="bn-item active">
+      <span class="bn-icon">&#128197;</span>
+      <span>المواعيد</span>
+    </button>
+  </nav>
+
+  <script src="/assets/js/app.js"></script>
+</body>
+</html>
