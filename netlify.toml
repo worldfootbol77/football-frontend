@@ -1,4 +1,0 @@
-[[redirects]]
-  from = "/api/*"
-  to = "https://football-worker.mahdijadir38.workers.dev/api/:splat"
-  status = 200
