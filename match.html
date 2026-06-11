@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>تفاصيل المباراة - Scorio</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #1f2a3e;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text2: #8b949e;
+      --green: #4ade80;
+      --red: #e63946;
+      --blue: #58a6ff;
+      --orange: #f97316;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Cairo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      max-width: 650px;
+      margin: 0 auto;
+      padding-bottom: 2rem;
+    }
+
+    .back-header {
+      position: sticky;
+      top: 0;
+      background: var(--bg2);
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .back-btn {
+      background: none;
+      border: none;
+      color: var(--blue);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .back-header h2 { font-size: 1.1rem; }
+
+    .match-hero {
+      background: var(--bg2);
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-league {
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--text2);
+      margin-bottom: 0.5rem;
+    }
+    .hero-teams {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin: 0.8rem 0;
+    }
+    .hero-team {
+      flex: 1;
+      text-align: center;
+    }
+    .hero-logo {
+      width: 55px;
+      height: 55px;
+      object-fit: contain;
+      margin-bottom: 0.3rem;
+    }
+    .hero-team-name {
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+    .hero-score {
+      font-size: 2rem;
+      font-weight: 900;
+      min-width: 80px;
+      text-align: center;
+    }
+    .hero-score.live { color: var(--red); }
+    .hero-status {
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--text2);
+      margin-top: 0.3rem;
+    }
+    .live-pill {
+      background: var(--red);
+      color: white;
+      padding: 0.2rem 0.6rem;
+      border-radius: 15px;
+      font-size: 0.7rem;
+    }
+
+    .tabs {
+      display: flex;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 55px;
+    }
+    .tab {
+      flex: 1;
+      padding: 0.7rem;
+      text-align: center;
+      background: none;
+      border: none;
+      color: var(--text2);
+      font-weight: 700;
+      cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+    }
+    .tab.active {
+      color: var(--blue);
+      border-bottom-color: var(--blue);
+    }
+    .tab-panel { display: none; padding: 0.5rem 0; }
+    .tab-panel.active { display: block; }
+
+    .event-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .event-minute {
+      min-width: 40px;
+      color: var(--text2);
+      font-weight: 800;
+      font-size: 0.75rem;
+    }
+    .event-icon { font-size: 0.9rem; }
+    .event-detail { flex: 1; }
+    .event-player { font-weight: 700; }
+    .event-team { font-size: 0.7rem; color: var(--text2); }
+
+    .lineup-switcher {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.8rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .lineup-btn {
+      flex: 1;
+      padding: 0.4rem;
+      background: var(--bg3);
+      border: none;
+      color: var(--text2);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .lineup-btn.active {
+      background: var(--blue);
+      color: white;
+    }
+    .lineup-panel { display: none; }
+    .lineup-panel.active { display: block; }
+    .player-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.8rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .player-number {
+      min-width: 30px;
+      color: var(--text2);
+      font-size: 0.75rem;
+    }
+    .player-name { flex: 1; font-weight: 600; }
+    .player-position { color: var(--text2); font-size: 0.7rem; }
+
+    .stat-item {
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.3rem;
+    }
+    .stat-home, .stat-away { font-weight: 800; width: 45px; text-align: center; }
+    .stat-name { flex: 1; text-align: center; font-size: 0.75rem; color: var(--text2); }
+    .stat-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .stat-fill-home { height: 100%; background: var(--blue); float: right; }
+    .stat-fill-away { height: 100%; background: var(--red); }
+
+    .section-title {
+      padding: 0.5rem 0.8rem;
+      background: var(--bg3);
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text2);
+    }
+    .loading, .error {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text2);
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="back-header">
+  <button class="back-btn" onclick="history.back()">→</button>
+  <h2>تفاصيل المباراة</h2>
+</div>
+
+<div id="content">
+  <div class="loading"><div class="spinner"></div>جارٍ التحميل...</div>
+</div>
+
+<script>
+  const WORKER_URL = 'https://football-worker.mahdijadir38.workers.dev';
+  
+  async function loadMatch() {
+    const params = new URLSearchParams(window.location.search);
+    const matchId = params.get('id');
+    const league = params.get('league') || '';
+    
+    if (!matchId) {
+      document.getElementById('content').innerHTML = '<div class="error">❌ معرف المباراة غير موجود</div>';
+      return;
+    }
+    
+    try {
+      const url = `${WORKER_URL}/api/summary?matchId=${matchId}&league=${league}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      renderMatch(data);
+    } catch (error) {
+      document.getElementById('content').innerHTML = `<div class="error">❌ خطأ: ${error.message}</div>`;
+    }
+  }
+  
+  function renderMatch(data) {
+    const isLive = data.status === 'in';
+    const isPost = data.status === 'post';
+    
+    const goalsHtml = (data.goals || []).map(g => `
+      <div class="event-row">
+        <span class="event-minute">${g.minute || ''}'</span>
+        <span class="event-icon">⚽</span>
+        <div class="event-detail">
+          <div class="event-player">${g.player || ''}</div>
+          <div class="event-team">${g.team || ''}</div>
+        </div>
+      </div>
+    `).join('') || '<div style="padding:1rem;text-align:center;color:var(--text2)">لا توجد أهداف</div>';
+    
+    const cardsHtml = (data.cards || []).map(c => `
+      <div class="event-row">
+        <span class="event-minute">${c.minute || ''}'</span>
+        <span class="event-icon">${c.type?.includes('Red') ? '🟥' : '🟨'}</span>
+        <div class="event-detail">
+          <div class="event-player">${c.player || ''}</div>
+          <div class="event-team">${c.team || ''}</div>
+        </div>
+      </div>
+    `).join('') || '<div style="padding:1rem;text-align:center;color:var(--text2)">لا توجد بطاقات</div>';
+    
+    const homeStarters = (data.homeLineup || []).filter(p => p.starter === true);
+    const homeSubs = (data.homeLineup || []).filter(p => p.starter !== true);
+    const awayStarters = (data.awayLineup || []).filter(p => p.starter === true);
+    const awaySubs = (data.awayLineup || []).filter(p => p.starter !== true);
+    
+    const lineupHtml = (starters, subs) => `
+      <div class="section-title">التشكيلة الأساسية</div>
+      ${starters.map(p => `
+        <div class="player-row">
+          <span class="player-number">${p.jersey || ''}</span>
+          <span class="player-name">${p.name || ''}</span>
+          <span class="player-position">${p.position || ''}</span>
+        </div>
+      `).join('') || '<div style="padding:1rem;text-align:center">لا توجد بيانات</div>'}
+      ${subs.length ? `<div class="section-title">الاحتياطيون</div>` : ''}
+      ${subs.map(p => `
+        <div class="player-row">
+          <span class="player-number">${p.jersey || ''}</span>
+          <span class="player-name">${p.name || ''}</span>
+          <span class="player-position">${p.position || ''}</span>
+        </div>
+      `).join('')}
+    `;
+    
+    let statsHtml = '';
+    if (data.homeStats && data.homeStats.length) {
+      statsHtml = data.homeStats.map((s, i) => {
+        const awayStat = data.awayStats?.[i];
+        const homeVal = parseFloat(s.value) || 0;
+        const awayVal = parseFloat(awayStat?.value) || 0;
+        const total = homeVal + awayVal || 1;
+        const homePercent = Math.round(homeVal / total * 100);
+        const awayPercent = 100 - homePercent;
+        return `
+          <div class="stat-item">
+            <div class="stat-row">
+              <span class="stat-home">${s.value}</span>
+              <span class="stat-name">${s.name}</span>
+              <span class="stat-away">${awayStat?.value || '-'}</span>
+            </div>
+            <div class="stat-bar">
+              <div class="stat-fill-home" style="width:${homePercent}%"></div>
+            </div>
+            <div class="stat-bar">
+              <div class="stat-fill-away" style="width:${awayPercent}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } else {
+      statsHtml = '<div style="padding:1rem;text-align:center;color:var(--text2)">لا توجد إحصائيات</div>';
+    }
+    
+    const html = `
+      <div class="match-hero">
+        <div class="hero-league">${data.leagueName || ''} ${data.round ? '| ' + data.round : ''}</div>
+        <div class="hero-teams">
+          <div class="hero-team">
+            ${data.homeLogo ? `<img class="hero-logo" src="${data.homeLogo}" onerror="this.style.display='none'">` : ''}
+            <div class="hero-team-name">${data.homeTeam}</div>
+          </div>
+          <div class="hero-score ${isLive ? 'live' : ''}">${data.homeScore} - ${data.awayScore}</div>
+          <div class="hero-team">
+            ${data.awayLogo ? `<img class="hero-logo" src="${data.awayLogo}" onerror="this.style.display='none'">` : ''}
+            <div class="hero-team-name">${data.awayTeam}</div>
+          </div>
+        </div>
+        <div class="hero-status">
+          ${isLive ? `<span class="live-pill">مباشر ${data.minute || ''}'</span>` : 
+            isPost ? `✅ ${data.statusText || 'انتهت'}` : 
+            `⏱️ ${data.date ? new Date(data.date).toLocaleTimeString('ar-EG') : ''}`}
+        </div>
+        ${data.venue ? `<div style="text-align:center;font-size:0.7rem;margin-top:0.5rem;color:var(--text2)">🏟️ ${data.venue}</div>` : ''}
+        ${data.advancement ? `<div style="text-align:center;font-size:0.75rem;margin-top:0.5rem;color:var(--green)">🏆 تأهل: ${data.advancement}</div>` : ''}
+        ${data.penaltyWinner ? `<div style="text-align:center;font-size:0.75rem;margin-top:0.5rem;color:var(--orange)">⚽ ركلات ترجيح: ${data.penaltyWinner}</div>` : ''}
+      </div>
+      
+      <div class="tabs">
+        <button class="tab active" data-tab="details">⚽ التفاصيل</button>
+        <button class="tab" data-tab="lineup">👥 التشكيلات</button>
+        <button class="tab" data-tab="stats">📊 الإحصائيات</button>
+      </div>
+      
+      <div class="tab-panel active" id="tab-details">
+        <div class="section-title">⚽ الأهداف</div>
+        ${goalsHtml}
+        <div class="section-title">🟨 البطاقات</div>
+        ${cardsHtml}
+      </div>
+      
+      <div class="tab-panel" id="tab-lineup">
+        <div class="lineup-switcher">
+          <button class="lineup-btn active" data-lineup="home">${data.homeTeam}</button>
+          <button class="lineup-btn" data-lineup="away">${data.awayTeam}</button>
+        </div>
+        <div class="lineup-panel active" id="lineup-home">${lineupHtml(homeStarters, homeSubs)}</div>
+        <div class="lineup-panel" id="lineup-away">${lineupHtml(awayStarters, awaySubs)}</div>
+      </div>
+      
+      <div class="tab-panel" id="tab-stats">
+        ${statsHtml}
+      </div>
+    `;
+    
+    document.getElementById('content').innerHTML = html;
+    
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.onclick = () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+      };
+    });
+    
+    document.querySelectorAll('.lineup-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.lineup-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.lineup-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(`lineup-${btn.dataset.lineup}`).classList.add('active');
+      };
+    });
+  }
+  
+  loadMatch();
+</script>
+</body>
+</html>
