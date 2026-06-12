@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>اختبار الـ API</title>
+  <meta charset="UTF-8">
+</head>
+<body>
+  <h1>اختبار اتصال الـ Worker</h1>
+  <pre id="output">جاري التحميل...</pre>
+  
+  <script>
+    const WORKER_URL = 'https://football-worker.mahdijadir38.workers.dev';
+    
+    async function testAPI() {
+      const output = document.getElementById('output');
+      output.textContent = 'جاري جلب البيانات...\n';
+      
+      try {
+        // جلب مباريات اليوم
+        const response = await fetch(`${WORKER_URL}/api/matches?date=20260612`);
+        const data = await response.json();
+        
+        output.textContent = '✅ تم جلب البيانات بنجاح!\n\n';
+        output.textContent += `عدد المباريات: ${data.matches?.length || 0}\n\n`;
+        output.textContent += 'أول 3 مباريات:\n';
+        output.textContent += '='.repeat(50) + '\n';
+        
+        if (data.matches && data.matches.length > 0) {
+          for (let i = 0; i < Math.min(3, data.matches.length); i++) {
+            const m = data.matches[i];
+            output.textContent += `\nالمباراة ${i+1}:\n`;
+            output.textContent += `  ID: ${m.id}\n`;
+            output.textContent += `  League: ${m.league}\n`;
+            output.textContent += `  League Name: ${m.leagueName}\n`;
+            output.textContent += `  Home: ${m.homeTeam} (${m.homeScore})\n`;
+            output.textContent += `  Away: ${m.awayTeam} (${m.awayScore})\n`;
+            output.textContent += `  Status: ${m.status}\n`;
+            output.textContent += '-'.repeat(30) + '\n';
+          }
+        } else {
+          output.textContent += 'لا توجد مباريات في هذا اليوم\n';
+        }
+        
+      } catch (error) {
+        output.textContent = `❌ خطأ: ${error.message}`;
+      }
+    }
+    
+    testAPI();
+  </script>
+</body>
+</html>
