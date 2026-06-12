@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>البطولات - Scorio</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #1f2a3e;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text2: #8b949e;
+      --blue: #58a6ff;
+      --green: #4ade80;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Cairo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      max-width: 650px;
+      margin: 0 auto;
+      padding-bottom: 70px;
+    }
+
+    .back-header {
+      position: sticky;
+      top: 0;
+      background: var(--bg2);
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .back-btn {
+      background: none;
+      border: none;
+      color: var(--blue);
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .league-selector {
+      padding: 0.8rem;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+    }
+    .league-selector select {
+      width: 100%;
+      padding: 0.6rem;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      font-family: inherit;
+    }
+
+    .tabs {
+      display: flex;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+    }
+    .tab {
+      flex: 1;
+      padding: 0.7rem;
+      text-align: center;
+      background: none;
+      border: none;
+      color: var(--text2);
+      font-weight: 700;
+      cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+    }
+    .tab.active {
+      color: var(--blue);
+      border-bottom-color: var(--blue);
+    }
+    .tab-panel { display: none; padding: 0.5rem 0; }
+    .tab-panel.active { display: block; }
+
+    .standings-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+    }
+    .standings-table th, .standings-table td {
+      padding: 0.5rem 0.3rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .standings-table th { color: var(--text2); font-weight: 700; }
+    .standings-table td:first-child { font-weight: 700; }
+    .standings-table td:nth-child(2) { text-align: right; }
+    .team-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .team-logo { width: 18px; height: 18px; object-fit: contain; }
+    .pts { font-weight: 900; color: var(--green); }
+
+    .scorer-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .scorer-rank {
+      width: 30px;
+      font-weight: 900;
+      color: var(--text2);
+    }
+    .scorer-rank.gold { color: #f59e0b; }
+    .scorer-rank.silver { color: #94a3b8; }
+    .scorer-rank.bronze { color: #cd7f32; }
+    .scorer-photo {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--bg3);
+    }
+    .scorer-info { flex: 1; }
+    .scorer-name { font-weight: 800; }
+    .scorer-team { font-size: 0.7rem; color: var(--text2); }
+    .scorer-goals {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--green);
+    }
+
+    .loading, .error {
+      text-align: center;
+      padding: 3rem;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      max-width: 650px;
+      width: 100%;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      display: flex;
+    }
+    .bn-item {
+      flex: 1;
+      padding: 0.6rem;
+      text-align: center;
+      background: none;
+      border: none;
+      color: var(--text2);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .bn-item.active { color: var(--blue); }
+  </style>
+</head>
+<body>
+
+<div class="back-header">
+  <button class="back-btn" onclick="history.back()">→</button>
+  <h2>البطولات</h2>
+</div>
+
+<div class="league-selector">
+  <select id="league-select">
+    <option value="eng.1">🏴󠁧󠁢󠁥󠁮󠁧󠁿 الدوري الإنجليزي</option>
+    <option value="esp.1">🇪🇸 الدوري الإسباني</option>
+    <option value="ger.1">🇩🇪 الدوري الألماني</option>
+    <option value="ita.1">🇮🇹 الدوري الإيطالي</option>
+    <option value="fra.1">🇫🇷 الدوري الفرنسي</option>
+    <option value="ksa.1">🇸🇦 الدوري السعودي</option>
+    <option value="egy.1">🇪🇬 الدوري المصري</option>
+    <option value="mar.1">🇲🇦 الدوري المغربي</option>
+    <option value="uefa.champions">🏆 دوري أبطال أوروبا</option>
+    <option value="conmebol.libertadores">🏆 كوبا ليبرتادوريس</option>
+  </select>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="standings">🏆 الترتيب</button>
+  <button class="tab" data-tab="scorers">⚽ الهدافون</button>
+</div>
+
+<div class="tab-panel active" id="tab-standings"><div class="loading"><div class="spinner"></div></div></div>
+<div class="tab-panel" id="tab-scorers"><div class="loading"><div class="spinner"></div></div></div>
+
+<nav class="bottom-nav">
+  <button class="bn-item" onclick="location.href='index.html'">⚽ المباريات</button>
+  <button class="bn-item active">🏆 بطولات</button>
+</nav>
+
+<script>
+  const WORKER_URL = 'https://football-worker.mahdijadir38.workers.dev';
+  let currentLeague = 'eng.1';
+  
+  async function loadStandings() {
+    const container = document.getElementById('tab-standings');
+    container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    
+    try {
+      const url = `${WORKER_URL}/api/standings?league=${currentLeague}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      
+      if (!data.entries || !data.entries.length) {
+        container.innerHTML = '<div style="padding:2rem;text-align:center">لا توجد بيانات للترتيب</div>';
+        return;
+      }
+      
+      let tableHtml = `
+        <table class="standings-table">
+          <thead>
+            <tr>
+              <th>#</th><th>الفريق</th><th>ل</th><th>ف</th><th>ت</th><th>خ</th><th>فا</th><th>ن</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      data.entries.forEach(entry => {
+        tableHtml += `
+          <tr>
+            <td>${entry.rank}</td>
+            <td><div class="team-cell">${entry.logo ? `<img class="team-logo" src="${entry.logo}" onerror="this.style.display='none'">` : ''}${entry.team}</div></td>
+            <td>${entry.gp}</td><td>${entry.w}</td><td>${entry.d}</td><td>${entry.l}</td>
+            <td>${entry.gd > 0 ? '+' : ''}${entry.gd}</td>
+            <td class="pts">${entry.pts}</td>
+          </tr>
+        `;
+      });
+      
+      tableHtml += '</tbody></table>';
+      container.innerHTML = tableHtml;
+      
+    } catch (error) {
+      container.innerHTML = `<div class="error">❌ خطأ: ${error.message}</div>`;
+    }
+  }
+  
+  async function loadScorers() {
+    const container = document.getElementById('tab-scorers');
+    container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    
+    try {
+      const url = `${WORKER_URL}/api/scorers?league=${currentLeague}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      
+      if (!data.scorers || !data.scorers.length) {
+        container.innerHTML = '<div style="padding:2rem;text-align:center">لا توجد بيانات للهدافين</div>';
+        return;
+      }
+      
+      let scorersHtml = '';
+      data.scorers.forEach(s => {
+        let rankClass = '';
+        if (s.rank === 1) rankClass = 'gold';
+        else if (s.rank === 2) rankClass = 'silver';
+        else if (s.rank === 3) rankClass = 'bronze';
+        
+        scorersHtml += `
+          <div class="scorer-row">
+            <div class="scorer-rank ${rankClass}">${s.rank}</div>
+            ${s.photo ? `<img class="scorer-photo" src="${s.photo}" onerror="this.style.display='none'">` : '<div class="scorer-photo"></div>'}
+            <div class="scorer-info">
+              <div class="scorer-name">${s.name}</div>
+              <div class="scorer-team">${s.team}</div>
+            </div>
+            <div class="scorer-goals">${s.goals}</div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = scorersHtml;
+      
+    } catch (error) {
+      container.innerHTML = `<div class="error">❌ خطأ: ${error.message}</div>`;
+    }
+  }
+  
+  function changeLeague() {
+    currentLeague = document.getElementById('league-select').value;
+    loadStandings();
+    loadScorers();
+  }
+  
+  document.getElementById('league-select').onchange = changeLeague;
+  
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.onclick = () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+    };
+  });
+  
+  loadStandings();
+  loadScorers();
+</script>
+</body>
+</html>
