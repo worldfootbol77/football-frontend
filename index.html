@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scorio - مباريات اليوم</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 1rem;
+      padding-bottom: 70px;
+    }
+    .header { text-align: center; padding: 1rem; background: #161b22; border-radius: 12px; margin-bottom: 1rem; }
+    .date-bar { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; }
+    .date-btn { background: #1f2a3e; border: none; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; cursor: pointer; }
+    .date-pill { background: #58a6ff; color: white; padding: 0.3rem 1rem; border-radius: 20px; font-weight: bold; cursor: pointer; }
+    .match-card { background: #161b22; border-radius: 10px; padding: 0.8rem; margin-bottom: 0.5rem; cursor: pointer; }
+    .match-card:active { background: #1f2a3e; }
+    .match-teams { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+    .team { flex: 1; text-align: center; }
+    .team-name { font-size: 0.85rem; font-weight: bold; }
+    .score { font-size: 1.2rem; font-weight: 900; min-width: 60px; text-align: center; }
+    .score.live { color: #e63946; }
+    .status { font-size: 0.65rem; color: #8b949e; text-align: center; margin-top: 0.3rem; }
+    .loading { text-align: center; padding: 2rem; }
+    .spinner { width: 40px; height: 40px; border: 3px solid #30363d; border-top-color: #58a6ff; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .bottom-nav { position: fixed; bottom: 0; max-width: 650px; width: 100%; background: #161b22; border-top: 1px solid #30363d; display: flex; }
+    .nav-item { flex: 1; text-align: center; padding: 0.6rem; background: none; border: none; color: #8b949e; font-weight: bold; cursor: pointer; }
+    .nav-item.active { color: #58a6ff; }
+  </style>
+</head>
+<body>
+
+<div class="header"><h1>⚽ Scorio</h1></div>
+
+<div class="date-bar">
+  <button class="date-btn" id="prevDay">▶</button>
+  <button class="date-pill" id="dateDisplay">اليوم</button>
+  <button class="date-btn" id="nextDay">◀</button>
+</div>
+
+<div id="matchesContainer"><div class="loading"><div class="spinner"></div></div></div>
+
+<div class="bottom-nav">
+  <button class="nav-item active" id="navMatches">⚽ المباريات</button>
+  <button class="nav-item" id="navLeague">🏆 بطولات</button>
+</div>
+
+<script>
+  const WORKER_URL = 'https://football-worker.mahdijadir38.workers.dev';
+  
+  // قاموس ترجمة أسماء الدوريات والمراحل
+  const LEAGUE_NAMES = {
+    '2026-league-of-ireland-premier': '🇮🇪 الدوري الأيرلندي الممتاز',
+    '2026-bolivian-liga-profesional': '🇧🇴 دوري الدرجة الأولى البوليفي',
+    'bra.2': '🇧🇷 الدوري البرازيلي الدرجة الثانية',
+    'chi.1': '🇨🇱 الدوري التشيلي',
+    'regular-season': '🇦🇷 الدوري الأرجنتيني',
+    'group-stage': 'دور المجموعات',
+    'round-of-32': 'دور الـ 32',
+    'round-of-16': 'دور الـ 16',
+    'quarter-final': 'ربع النهائي',
+    'semi-final': 'نصف النهائي',
+    'final': 'النهائي',
+    '2026-international-friendly': '🤝 مباراة ودية دولية',
+    'eng.1': '🏴󠁧󠁢󠁥󠁮󠁧󠁿 الدوري الإنجليزي',
+    'esp.1': '🇪🇸 الدوري الإسباني',
+    'ger.1': '🇩🇪 الدوري الألماني',
+    'ita.1': '🇮🇹 الدوري الإيطالي',
+    'fra.1': '🇫🇷 الدوري الفرنسي',
+    'ksa.1': '🇸🇦 الدوري السعودي',
+    'egy.1': '🇪🇬 الدوري المصري',
+    'mar.1': '🇲🇦 الدوري المغربي'
+  };
+  
+  // قاموس أسماء البطولات بناءً على الفرق
+  const TOURNAMENT_NAMES = {
+    // كأس العالم 2026
+    'Canada': '🌍 كأس العالم 2026',
+    'Bosnia-Herzegovina': '🌍 كأس العالم 2026',
+    'United States': '🌍 كأس العالم 2026',
+    'Paraguay': '🌍 كأس العالم 2026',
+    'Mexico': '🌍 كأس العالم 2026',
+    'South Africa': '🌍 كأس العالم 2026',
+    'Japan': '🌍 كأس العالم 2026',
+    'South Korea': '🌍 كأس العالم 2026',
+    'Germany': '🌍 كأس العالم 2026',
+    'France': '🌍 كأس العالم 2026',
+    'England': '🌍 كأس العالم 2026',
+    'Spain': '🌍 كأس العالم 2026',
+    'Brazil': '🌍 كأس العالم 2026',
+    'Argentina': '🌍 كأس العالم 2026',
+    'Croatia': '🌍 كأس العالم 2026',
+    'Netherlands': '🌍 كأس العالم 2026',
+    'Portugal': '🌍 كأس العالم 2026',
+    'Belgium': '🌍 كأس العالم 2026',
+    'Switzerland': '🌍 كأس العالم 2026',
+    'Denmark': '🌍 كأس العالم 2026',
+    'Uruguay': '🌍 كأس العالم 2026',
+    'Senegal': '🌍 كأس العالم 2026',
+    'Ghana': '🌍 كأس العالم 2026',
+    'Cameroon': '🌍 كأس العالم 2026',
+    'Morocco': '🌍 كأس العالم 2026',
+    'Tunisia': '🌍 كأس العالم 2026',
+    'Saudi Arabia': '🌍 كأس العالم 2026',
+    'Iran': '🌍 كأس العالم 2026',
+    'Australia': '🌍 كأس العالم 2026',
+    
+    // كأس العالم للشباب
+    'Japan U20': '🏆 كأس العالم للشباب تحت 20 سنة',
+    'Venezuela U20': '🏆 كأس العالم للشباب تحت 20 سنة',
+    'Portugal U20': '🏆 كأس العالم للشباب تحت 20 سنة',
+    'Canada U20': '🏆 كأس العالم للشباب تحت 20 سنة',
+    'USA U20': '🏆 كأس العالم للشباب تحت 20 سنة',
+    'Mexico U20': '🏆 كأس العالم للشباب تحت 20 سنة',
+    'Brazil U20': '🏆 كأس العالم للشباب تحت 20 سنة',
+    'Argentina U20': '🏆 كأس العالم للشباب تحت 20 سنة',
+    
+    // دوري أبطال أوروبا
+    'Real Madrid': '🏆 دوري أبطال أوروبا',
+    'Barcelona': '🏆 دوري أبطال أوروبا',
+    'Bayern Munich': '🏆 دوري أبطال أوروبا',
+    'Manchester City': '🏆 دوري أبطال أوروبا',
+    'Liverpool': '🏆 دوري أبطال أوروبا',
+    'Paris Saint-Germain': '🏆 دوري أبطال أوروبا',
+    'Chelsea': '🏆 دوري أبطال أوروبا',
+    'Manchester United': '🏆 دوري أبطال أوروبا',
+    'Juventus': '🏆 دوري أبطال أوروبا',
+    'AC Milan': '🏆 دوري أبطال أوروبا',
+    'Inter Milan': '🏆 دوري أبطال أوروبا',
+    'Borussia Dortmund': '🏆 دوري أبطال أوروبا',
+    'Atletico Madrid': '🏆 دوري أبطال أوروبا',
+    'Napoli': '🏆 دوري أبطال أوروبا',
+    'Benfica': '🏆 دوري أبطال أوروبا',
+    'Porto': '🏆 دوري أبطال أوروبا',
+    'Ajax': '🏆 دوري أبطال أوروبا',
+    
+    // كأس أمم أفريقيا
+    'Egypt': '🏆 كأس أمم أفريقيا',
+    'Algeria': '🏆 كأس أمم أفريقيا',
+    'Nigeria': '🏆 كأس أمم أفريقيا',
+    'Senegal': '🏆 كأس أمم أفريقيا',
+    'Cameroon': '🏆 كأس أمم أفريقيا',
+    'Ghana': '🏆 كأس أمم أفريقيا',
+    'Ivory Coast': '🏆 كأس أمم أفريقيا',
+    'Mali': '🏆 كأس أمم أفريقيا',
+    'Burkina Faso': '🏆 كأس أمم أفريقيا',
+    'DR Congo': '🏆 كأس أمم أفريقيا',
+    
+    // كأس آسيا
+    'Qatar': '🏆 كأس آسيا',
+    'UAE': '🏆 كأس آسيا',
+    'Jordan': '🏆 كأس آسيا',
+    'Iraq': '🏆 كأس آسيا',
+    'Uzbekistan': '🏆 كأس آسيا',
+    'Oman': '🏆 كأس آسيا',
+    'Bahrain': '🏆 كأس آسيا',
+    'Kuwait': '🏆 كأس آسيا',
+    
+    // كوبا أمريكا
+    'Argentina': '🏆 كوبا أمريكا',
+    'Brazil': '🏆 كوبا أمريكا',
+    'Uruguay': '🏆 كوبا أمريكا',
+    'Colombia': '🏆 كوبا أمريكا',
+    'Chile': '🏆 كوبا أمريكا',
+    'Peru': '🏆 كوبا أمريكا',
+    'Ecuador': '🏆 كوبا أمريكا',
+    'Venezuela': '🏆 كوبا أمريكا',
+    'Bolivia': '🏆 كوبا أمريكا'
+  };
+  
+  // قائمة مراحل البطولة
+  const TOURNAMENT_STAGES = ['group-stage', 'round-of-32', 'round-of-16', 'quarter-final', 'semi-final', 'final'];
+  
+  function getTournamentNameFromMatches(matches) {
+    const tournamentCount = {};
+    
+    for (const match of matches) {
+      const allTeams = [match.homeTeam, match.awayTeam];
+      let foundTournament = null;
+      
+      for (const team of allTeams) {
+        if (TOURNAMENT_NAMES[team]) {
+          foundTournament = TOURNAMENT_NAMES[team];
+          break;
+        }
+      }
+      
+      if (!foundTournament && (match.homeTeam.includes('U20') || match.awayTeam.includes('U20'))) {
+        foundTournament = '🏆 كأس العالم للشباب';
+      }
+      
+      if (!foundTournament) {
+        foundTournament = '🏆 بطولة دولية';
+      }
+      
+      tournamentCount[foundTournament] = (tournamentCount[foundTournament] || 0) + 1;
+    }
+    
+    let maxCount = 0;
+    let mostCommonTournament = '🏆 بطولة دولية';
+    
+    for (const [tournament, count] of Object.entries(tournamentCount)) {
+      if (count > maxCount) {
+        maxCount = count;
+        mostCommonTournament = tournament;
+      }
+    }
+    
+    return mostCommonTournament;
+  }
+  
+  function getLeagueDisplay(leagueCode, originalName, matchesList) {
+    // الدوريات العادية ومراحل البطولة
+    if (LEAGUE_NAMES[leagueCode]) {
+      let name = LEAGUE_NAMES[leagueCode];
+      let flag = name.substring(0, 2);
+      
+      // إذا كانت مرحلة من مراحل البطولة، أضف اسم البطولة قبله
+      if (TOURNAMENT_STAGES.includes(leagueCode) && matchesList && matchesList.length > 0) {
+        const tournamentName = getTournamentNameFromMatches(matchesList);
+        name = `${tournamentName} - ${name}`;
+        flag = tournamentName.substring(0, 2);
+      }
+      
+      return { name: name, flag: flag };
+    }
+    
+    let name = originalName || leagueCode;
+    if (name.includes(' at ')) {
+      name = leagueCode.replace(/^\d{4}-/, '').replace(/-/g, ' ');
+      name = name.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+    return { name: name, flag: '⚽' };
+  }
+
+  let currentDate = new Date();
+  
+  function formatDate(date) {
+    return `${date.getFullYear()}${String(date.getMonth()+1).padStart(2,'0')}${String(date.getDate()).padStart(2,'0')}`;
+  }
+  
+  function formatDisplayDate(date) {
+    const today = new Date();
+    if (formatDate(date) === formatDate(today)) return 'اليوم';
+    const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+    return `${date.getDate()} ${months[date.getMonth()]}`;
+  }
+  
+  async function loadMatches() {
+    const container = document.getElementById('matchesContainer');
+    container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    
+    try {
+      const url = `${WORKER_URL}/api/matches?date=${formatDate(currentDate)}&force=true`;
+      const response = await fetch(url);
+      const data = await response.json();
+      const matches = data.matches || [];
+      
+      if (matches.length === 0) {
+        container.innerHTML = '<div class="loading">⚽ لا توجد مباريات</div>';
+        return;
+      }
+      
+      const groups = {};
+      for (const m of matches) {
+        const leagueKey = m.league || 'other';
+        if (!groups[leagueKey]) {
+          groups[leagueKey] = {
+            matches: []
+          };
+        }
+        groups[leagueKey].matches.push(m);
+      }
+      
+      let html = '';
+      for (const [key, group] of Object.entries(groups)) {
+        const leagueInfo = getLeagueDisplay(key, group.matches[0].leagueName, group.matches);
+        html += `<div style="margin-bottom:0.5rem;">`;
+        html += `<div style="background:#1f2a3e; padding:0.3rem 0.8rem; border-radius:8px; margin-bottom:0.3rem; font-size:0.75rem; font-weight:bold;">${leagueInfo.flag} ${leagueInfo.name}</div>`;
+        
+        for (const m of group.matches) {
+          const isLive = m.status === 'in';
+          const scoreText = m.status === 'pre' ? '-:-' : `${m.homeScore || 0} - ${m.awayScore || 0}`;
+          const statusText = m.status === 'pre' ? '⏱️ يبدأ' : (isLive ? '🟢 مباشر' : '✅ انتهت');
+          
+          html += `
+            <div class="match-card" onclick="location.href='match.html?id=${m.id}&league=${m.league}'">
+              <div class="match-teams">
+                <div class="team"><div class="team-name">${m.homeTeam}</div></div>
+                <div class="score ${isLive ? 'live' : ''}">${scoreText}</div>
+                <div class="team"><div class="team-name">${m.awayTeam}</div></div>
+              </div>
+              <div class="status">${statusText} ${m.minute ? m.minute + '\'' : ''}</div>
+            </div>
+          `;
+        }
+        html += `</div>`;
+      }
+      
+      container.innerHTML = html;
+      
+    } catch (error) {
+      container.innerHTML = `<div class="loading">⚠️ خطأ: ${error.message}</div>`;
+    }
+  }
+  
+  document.getElementById('prevDay').onclick = () => { currentDate.setDate(currentDate.getDate() - 1); document.getElementById('dateDisplay').textContent = formatDisplayDate(currentDate); loadMatches(); };
+  document.getElementById('nextDay').onclick = () => { currentDate.setDate(currentDate.getDate() + 1); document.getElementById('dateDisplay').textContent = formatDisplayDate(currentDate); loadMatches(); };
+  document.getElementById('dateDisplay').onclick = () => { currentDate = new Date(); document.getElementById('dateDisplay').textContent = formatDisplayDate(currentDate); loadMatches(); };
+  document.getElementById('navLeague').onclick = () => location.href = 'league.html';
+  
+  document.getElementById('dateDisplay').textContent = formatDisplayDate(currentDate);
+  loadMatches();
+</script>
+</body>
+</html>
