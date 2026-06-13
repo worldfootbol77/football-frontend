@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Scorio - نتائج مباريات كرة القدم</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 1rem;
+      padding-bottom: 70px;
+    }
+    .app-header {
+      position: sticky;
+      top: 0;
+      background: #161b22;
+      padding: 0.8rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #30363d;
+      z-index: 100;
+    }
+    .logo { font-size: 1.3rem; font-weight: 900; }
+    .logo span { color: #58a6ff; }
+    .hdr-btn {
+      background: none;
+      border: none;
+      color: #8b949e;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .status-tabs {
+      display: flex;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      position: sticky;
+      top: 55px;
+      z-index: 99;
+    }
+    .status-tab {
+      flex: 1;
+      padding: 0.6rem;
+      text-align: center;
+      background: none;
+      border: none;
+      color: #8b949e;
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .status-tab.active {
+      color: #58a6ff;
+      border-bottom-color: #58a6ff;
+    }
+    .live-badge {
+      background: #e63946;
+      color: white;
+      border-radius: 10px;
+      padding: 0.1rem 0.4rem;
+      font-size: 0.65rem;
+    }
+    .hidden { display: none !important; }
+    .date-bar {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+    }
+    .date-pill {
+      background: #1f2a3e;
+      border: 1px solid #30363d;
+      border-radius: 25px;
+      padding: 0.3rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .date-nav {
+      background: #1f2a3e;
+      border: 1px solid #30363d;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .league-sep {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.3rem 0.8rem;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #8b949e;
+      cursor: pointer;
+    }
+    .league-sep .chevron { margin-right: auto; transition: transform 0.2s; }
+    .league-sep.collapsed .chevron { transform: rotate(-90deg); }
+    .league-matches.hidden { display: none; }
+    .match-card {
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      padding: 0.5rem 0.8rem;
+      cursor: pointer;
+    }
+    .match-card:active { background: #1f2a3e; }
+    .match-card.live { border-right: 3px solid #e63946; }
+    .match-teams {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.3rem;
+    }
+    .team {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+    }
+    .team-logo { width: 28px; height: 28px; object-fit: contain; }
+    .team-name { font-weight: 700; font-size: 0.8rem; text-align: center; }
+    .score { font-size: 1.1rem; font-weight: 900; min-width: 55px; text-align: center; }
+    .score.live { color: #e63946; }
+    .status {
+      font-size: 0.65rem;
+      color: #8b949e;
+      text-align: center;
+      margin-top: 0.2rem;
+    }
+    .live-badge-small { background: #e63946; color: white; padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.6rem; }
+    .loading, .empty-state { text-align: center; padding: 2rem; color: #8b949e; }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #30363d;
+      border-top-color: #58a6ff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      max-width: 650px;
+      width: 100%;
+      background: #161b22;
+      border-top: 1px solid #30363d;
+      display: flex;
+      z-index: 100;
+    }
+    .bn-item {
+      flex: 1;
+      padding: 0.6rem;
+      text-align: center;
+      background: none;
+      border: none;
+      color: #8b949e;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .bn-item.active { color: #58a6ff; }
+    .divider { height: 0.3rem; background: #0d1117; }
+  </style>
+</head>
+<body>
+
+<header class="app-header">
+  <button class="hdr-btn" id="btn-menu">☰</button>
+  <div class="logo">Scorio <span>⚽</span></div>
+  <button class="hdr-btn" id="btn-cal">📅</button>
+</header>
+
+<div class="status-tabs">
+  <button class="status-tab active" data-filter="all">الكل</button>
+  <button class="status-tab" data-filter="live">مباشر <span id="live-count" class="live-badge hidden">0</span></button>
+  <button class="status-tab" data-filter="pre">القادمة</button>
+  <button class="status-tab" data-filter="post">انتهت</button>
+</div>
+
+<div class="date-bar">
+  <button class="date-nav" id="prev-day">›</button>
+  <button class="date-pill" id="date-pill">اليوم</button>
+  <button class="date-nav" id="next-day">‹</button>
+</div>
+
+<div id="matches-container">
+  <div class="loading"><div class="spinner"></div></div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="bn-item active" id="nav-matches">⚽ المباريات</button>
+  <button class="bn-item" id="nav-league">🏆 بطولات</button>
+</nav>
+
+<script>
+  const WORKER_URL = 'https://football-worker.mahdijadir38.workers.dev';
+  
+  let currentDate = new Date();
+  let allMatches = [];
+  let activeFilter = 'all';
+  let refreshTimer = null;
+
+  function formatDate(date) {
+    return `${date.getFullYear()}${String(date.getMonth()+1).padStart(2,'0')}${String(date.getDate()).padStart(2,'0')}`;
+  }
+
+  function formatDisplayDate(date) {
+    const today = new Date();
+    if (formatDate(date) === formatDate(today)) return 'اليوم';
+    const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+    return `${date.getDate()} ${months[date.getMonth()]}`;
+  }
+
+  function formatTime(isoDate) {
+    try {
+      const d = new Date(isoDate);
+      return d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+    } catch { return ''; }
+  }
+
+  async function loadMatches() {
+    const container = document.getElementById('matches-container');
+    container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    
+    try {
+      const url = `${WORKER_URL}/api/matches?date=${formatDate(currentDate)}&force=true`;
+      const response = await fetch(url);
+      const data = await response.json();
+      allMatches = data.matches || [];
+      
+      updateLiveBadge();
+      renderMatches();
+      
+      const hasLive = allMatches.some(m => m.status === 'in');
+      if (hasLive) {
+        if (refreshTimer) clearTimeout(refreshTimer);
+        refreshTimer = setTimeout(loadMatches, 60000);
+      }
+    } catch (error) {
+      console.error('خطأ:', error);
+      container.innerHTML = `<div class="empty-state">⚠️ خطأ: ${error.message}</div>`;
+    }
+  }
+
+  function updateLiveBadge() {
+    const liveCount = allMatches.filter(m => m.status === 'in').length;
+    const badge = document.getElementById('live-count');
+    if (liveCount > 0) {
+      badge.textContent = liveCount;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
+
+  function renderMatches() {
+    let filtered = [...allMatches];
+    if (activeFilter === 'live') filtered = filtered.filter(m => m.status === 'in');
+    else if (activeFilter === 'pre') filtered = filtered.filter(m => m.status === 'pre');
+    else if (activeFilter === 'post') filtered = filtered.filter(m => m.status === 'post');
+    
+    if (filtered.length === 0) {
+      document.getElementById('matches-container').innerHTML = '<div class="empty-state">⚽ لا توجد مباريات</div>';
+      return;
+    }
+    
+    // تجميع حسب leagueName (الذي أصبح صحيحاً من Worker)
+    const groups = {};
+    for (const m of filtered) {
+      let groupName = m.leagueName || m.league || 'other';
+      if (groupName.includes(' at ')) {
+        groupName = groupName.split(' at ')[0];
+      }
+      if (!groups[groupName]) {
+        groups[groupName] = { name: groupName, matches: [] };
+      }
+      groups[groupName].matches.push(m);
+    }
+    
+    let html = '';
+    for (const [key, group] of Object.entries(groups)) {
+      const icon = group.name.substring(0, 2);
+      html += `
+        <div class="league-sep" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('hidden')">
+          <span>${icon}</span>
+          <span style="flex:1">${group.name}</span>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="league-matches">
+      `;
+      
+      for (const m of group.matches) {
+        const isLive = m.status === 'in';
+        const scoreText = m.status === 'pre' ? '-:-' : `${m.homeScore || 0} - ${m.awayScore || 0}`;
+        const statusText = m.status === 'pre' ? '⏱️ يبدأ' : (isLive ? '🟢 مباشر' : '✅ انتهت');
+        
+        html += `
+          <div class="match-card ${isLive ? 'live' : ''}" onclick="location.href='match.html?id=${m.id}&league=${m.league}'">
+            <div class="match-teams">
+              <div class="team">
+                ${m.homeLogo ? `<img class="team-logo" src="${m.homeLogo}" onerror="this.style.display='none'">` : ''}
+                <div class="team-name">${m.homeTeam}</div>
+              </div>
+              <div class="score ${isLive ? 'live' : ''}">${scoreText}</div>
+              <div class="team">
+                ${m.awayLogo ? `<img class="team-logo" src="${m.awayLogo}" onerror="this.style.display='none'">` : ''}
+                <div class="team-name">${m.awayTeam}</div>
+              </div>
+            </div>
+            <div class="status">${statusText} ${m.minute ? m.minute + '\'' : ''}</div>
+          </div>
+        `;
+      }
+      html += `</div><div class="divider"></div>`;
+    }
+    
+    document.getElementById('matches-container').innerHTML = html;
+  }
+
+  function setFilter(filter) {
+    activeFilter = filter;
+    document.querySelectorAll('.status-tab').forEach(tab => {
+      if (tab.dataset.filter === filter) tab.classList.add('active');
+      else tab.classList.remove('active');
+    });
+    renderMatches();
+  }
+
+  document.getElementById('prev-day').onclick = () => {
+    currentDate.setDate(currentDate.getDate() - 1);
+    document.getElementById('date-pill').textContent = formatDisplayDate(currentDate);
+    loadMatches();
+  };
+  
+  document.getElementById('next-day').onclick = () => {
+    currentDate.setDate(currentDate.getDate() + 1);
+    document.getElementById('date-pill').textContent = formatDisplayDate(currentDate);
+    loadMatches();
+  };
+  
+  document.getElementById('date-pill').onclick = () => {
+    currentDate = new Date();
+    document.getElementById('date-pill').textContent = formatDisplayDate(currentDate);
+    loadMatches();
+  };
+  
+  document.querySelectorAll('.status-tab').forEach(tab => {
+    tab.onclick = () => setFilter(tab.dataset.filter);
+  });
+  
+  document.getElementById('nav-league').onclick = () => {
+    window.location.href = 'league.html';
+  };
+  
+  document.getElementById('date-pill').textContent = formatDisplayDate(currentDate);
+  loadMatches();
+</script>
+</body>
+  </html>
