@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Scorio - مباريات اليوم</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:     #0d1117;
+      --bg2:    #161b22;
+      --bg3:    #1f2a3e;
+      --border: #30363d;
+      --text1:  #e6edf3;
+      --text2:  #8b949e;
+      --blue:   #58a6ff;
+      --red:    #e63946;
+      --green:  #3fb950;
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: var(--bg);
+      color: var(--text1);
+      max-width: 650px;
+      margin: 0 auto;
+      padding-bottom: 70px;
+    }
+
+    /* ── Header ────────────────────────────────────────── */
+    .app-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.75rem 1rem;
+    }
+    .logo { font-size: 1.3rem; font-weight: 900; }
+    .logo span { color: var(--blue); }
+
+    /* ── فلاتر الحالة ──────────────────────────────────── */
+    .status-tabs {
+      position: sticky; top: 49px; z-index: 99;
+      display: flex;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+    }
+    .stab {
+      flex: 1; padding: 0.55rem 0.3rem;
+      background: none; border: none;
+      color: var(--text2); font-family: 'Cairo', sans-serif;
+      font-weight: 700; font-size: 0.78rem;
+      cursor: pointer; border-bottom: 2px solid transparent;
+      display: flex; align-items: center; justify-content: center; gap: 0.3rem;
+    }
+    .stab.active { color: var(--blue); border-bottom-color: var(--blue); }
+    .live-count {
+      background: var(--red); color: #fff;
+      border-radius: 10px; padding: 0 0.35rem;
+      font-size: 0.65rem; font-weight: 900;
+    }
+    .hidden { display: none !important; }
+
+    /* ── شريط التاريخ ──────────────────────────────────── */
+    .date-bar {
+      display: flex; justify-content: center; align-items: center; gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg2); border-bottom: 1px solid var(--border);
+    }
+    .date-pill {
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text1); font-family: 'Cairo', sans-serif;
+      font-weight: 700; font-size: 0.9rem;
+      border-radius: 20px; padding: 0.3rem 1.2rem;
+      cursor: pointer; min-width: 100px; text-align: center;
+    }
+    .date-nav {
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text1); border-radius: 50%;
+      width: 34px; height: 34px; font-size: 1.1rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .date-nav:hover { background: var(--border); }
+
+    /* ── رأس البطولة ───────────────────────────────────── */
+    .league-header {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.5rem; padding: 0.4rem 0.9rem;
+      background: var(--bg2); border-bottom: 1px solid var(--border);
+      cursor: pointer; user-select: none;
+    }
+    .league-header-left {
+      display: flex; align-items: center; gap: 0.4rem;
+      min-width: 0; flex: 1;
+    }
+    .l-flag  { font-size: 1.1rem; flex-shrink: 0; }
+    .l-name  { font-size: 0.82rem; font-weight: 700; color: var(--text1);
+               white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .l-year  { font-size: 0.72rem; color: var(--text2); flex-shrink: 0; }
+    .l-stage {
+      font-size: 0.68rem; font-weight: 600;
+      color: var(--blue); background: rgba(88,166,255,0.12);
+      border: 1px solid rgba(88,166,255,0.3);
+      border-radius: 20px; padding: 0.08rem 0.5rem;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .l-chevron { color: var(--text2); font-size: 0.7rem; flex-shrink: 0; transition: transform .2s; }
+    .league-header.collapsed .l-chevron { transform: rotate(-90deg); }
+
+    /* ── بطاقة المباراة ────────────────────────────────── */
+    .match-card {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.6rem 0.9rem;
+      background: var(--bg2); border-bottom: 1px solid var(--border);
+      cursor: pointer; gap: 0.5rem;
+      transition: background 0.12s;
+    }
+    .match-card:hover  { background: var(--bg3); }
+    .match-card:active { background: var(--border); }
+    .match-card.live   { border-right: 3px solid var(--red); background: rgba(230,57,70,0.05); }
+
+    .team-block {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 0.25rem;
+    }
+    .team-logo { width: 30px; height: 30px; object-fit: contain; }
+    .team-name { font-size: 0.78rem; font-weight: 700; text-align: center;
+                 line-height: 1.2; max-width: 100px; }
+
+    .match-mid { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; min-width: 72px; }
+    .score-box { font-size: 1.15rem; font-weight: 900; letter-spacing: 2px; }
+    .score-box.live { color: var(--red); }
+    .score-time { font-size: 0.78rem; color: var(--text2); font-weight: 600; }
+    .status-badge {
+      font-size: 0.62rem; font-weight: 700; border-radius: 4px;
+      padding: 0.1rem 0.4rem;
+    }
+    .badge-live { background: var(--red); color: #fff; animation: pulse 1.4s infinite; }
+    .badge-pre  { color: var(--text2); }
+    .badge-post { color: var(--text2); }
+    @keyframes pulse { 50% { opacity: .55; } }
+
+    /* ── حالات عامة ────────────────────────────────────── */
+    .loading { text-align: center; padding: 3rem 1rem; color: var(--text2); }
+    .spinner {
+      width: 38px; height: 38px; margin: 0 auto 1rem;
+      border: 3px solid var(--border); border-top-color: var(--blue);
+      border-radius: 50%; animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty { text-align: center; padding: 3rem 1rem; color: var(--text2); font-size: .9rem; }
+
+    /* ── شريط التحديث ──────────────────────────────────── */
+    .refresh-bar {
+      position: fixed; bottom: 68px; left: 50%; transform: translateX(-50%);
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 20px; padding: 0.25rem 0.9rem;
+      font-size: 0.7rem; color: var(--text2);
+      display: none; z-index: 200; white-space: nowrap;
+    }
+    .refresh-bar.on { display: block; }
+    .rdot {
+      display: inline-block; width: 6px; height: 6px;
+      background: var(--green); border-radius: 50%;
+      margin-left: 0.3rem; vertical-align: middle;
+      animation: pulse 1s infinite;
+    }
+
+    /* ── شريط التنقل السفلي ────────────────────────────── */
+    .bottom-nav {
+      position: fixed; bottom: 0; z-index: 100;
+      max-width: 650px; width: 100%;
+      background: var(--bg2); border-top: 1px solid var(--border);
+      display: flex;
+    }
+    .bn {
+      flex: 1; padding: 0.65rem;
+      background: none; border: none;
+      color: var(--text2); font-family: 'Cairo', sans-serif;
+      font-weight: 700; font-size: 0.85rem;
+      cursor: pointer; text-align: center;
+    }
+    .bn.active { color: var(--blue); }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ───────────────────────────────────────────────────────── -->
+<header class="app-header">
+  <div style="width:32px"></div>
+  <div class="logo">Scorio <span>⚽</span></div>
+  <div style="width:32px"></div>
+</header>
+
+<!-- ── فلاتر الحالة ─────────────────────────────────────────────────── -->
+<div class="status-tabs">
+  <button class="stab active" data-f="all">الكل</button>
+  <button class="stab" data-f="live">
+    مباشر <span id="live-count" class="live-count hidden">0</span>
+  </button>
+  <button class="stab" data-f="pre">القادمة</button>
+  <button class="stab" data-f="post">انتهت</button>
+</div>
+
+<!-- ── شريط التاريخ ─────────────────────────────────────────────────── -->
+<div class="date-bar">
+  <button class="date-nav" id="btn-prev">›</button>
+  <button class="date-pill" id="btn-date">اليوم</button>
+  <button class="date-nav" id="btn-next">‹</button>
+</div>
+
+<!-- ── المباريات ────────────────────────────────────────────────────── -->
+<div id="matches-container">
+  <div class="loading"><div class="spinner"></div>جارٍ التحميل...</div>
+</div>
+
+<!-- ── شريط التحديث ─────────────────────────────────────────────────── -->
+<div class="refresh-bar" id="refresh-bar">
+  <span class="rdot"></span> يتجدد تلقائياً
+</div>
+
+<!-- ── التنقل السفلي ─────────────────────────────────────────────────── -->
+<nav class="bottom-nav">
+  <button class="bn active" id="nav-matches">⚽ المباريات</button>
+  <button class="bn" id="nav-leagues">🏆 البطولات</button>
+</nav>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// ⚙️  غيّر هذا السطر بعد نشر الـ Worker
+// ══════════════════════════════════════════════════════════════════
+const WORKER_URL = 'https://football-worker.YOUR_NAME.workers.dev';
+
+// ─── الحالة العامة ────────────────────────────────────────────────
+let currentDate  = new Date();
+let allMatches   = [];
+let activeFilter = 'all';
+let refreshTimer = null;
+
+// ─── مساعدات التاريخ ──────────────────────────────────────────────
+function toApiDate(d) {
+  return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+}
+function toDisplayDate(d) {
+  const t = new Date(); t.setHours(0,0,0,0); d = new Date(d); d.setHours(0,0,0,0);
+  const diff = Math.round((d - t) / 86400000);
+  if (diff ===  0) return 'اليوم';
+  if (diff === -1) return 'أمس';
+  if (diff ===  1) return 'غداً';
+  const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو',
+                  'يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  return `${d.getDate()} ${months[d.getMonth()]}`;
+}
+function toTimeStr(iso) {
+  try { return new Date(iso).toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' }); }
+  catch { return ''; }
+}
+
+// ─── جلب المباريات ────────────────────────────────────────────────
+async function loadMatches() {
+  const container = document.getElementById('matches-container');
+  if (!allMatches.length) {
+    container.innerHTML = '<div class="loading"><div class="spinner"></div>جارٍ التحميل...</div>';
+  }
+
+  try {
+    const res  = await fetch(`${WORKER_URL}/api/matches?date=${toApiDate(currentDate)}`);
+    const data = await res.json();
+    allMatches  = data.matches || [];
+
+    updateLiveBadge();
+    renderMatches();
+
+    const hasLive = allMatches.some(m => m.status === 'in');
+    document.getElementById('refresh-bar').classList.toggle('on', hasLive);
+    clearTimeout(refreshTimer);
+    if (hasLive) refreshTimer = setTimeout(loadMatches, 60000);
+
+  } catch (e) {
+    if (!allMatches.length) {
+      container.innerHTML = `<div class="empty">⚠️ خطأ في التحميل<br><small>${e.message}</small></div>`;
+    }
+  }
+}
+
+// ─── تحديث عداد المباريات المباشرة ───────────────────────────────
+function updateLiveBadge() {
+  const n   = allMatches.filter(m => m.status === 'in').length;
+  const el  = document.getElementById('live-count');
+  el.textContent = n;
+  el.classList.toggle('hidden', n === 0);
+}
+
+// ─── عرض المباريات ────────────────────────────────────────────────
+function renderMatches() {
+  const container = document.getElementById('matches-container');
+
+  // فلترة
+  let list = allMatches;
+  if (activeFilter === 'live') list = list.filter(m => m.status === 'in');
+  if (activeFilter === 'pre')  list = list.filter(m => m.status === 'pre');
+  if (activeFilter === 'post') list = list.filter(m => m.status === 'post');
+
+  if (!list.length) {
+    container.innerHTML = '<div class="empty">⚽ لا توجد مباريات</div>';
+    return;
+  }
+
+  // ✅ التجميع بـ leagueId — مفتاح فريد لكل بطولة قادم من uid
+  // leagueId = "606" لكأس العالم، "775" لأبطال أوروبا، "640" للتشيلي...
+  // ❌ لا تجمع بـ leagueName أو season.slug — فهما يتصادمان بين البطولات
+  const groups = new Map();
+  for (const m of list) {
+    const key = m.leagueId || 'other';
+    if (!groups.has(key)) {
+      groups.set(key, {
+        name:  m.leagueName  || key,
+        flag:  m.leagueFlag  || '⚽',
+        stage: m.leagueStage || '',
+        year:  m.leagueYear  || m.season || '',
+        slug:  m.league      || '',   // للـ API (fifa.world, eng.1...)
+        list:  [],
+      });
+    }
+    groups.get(key).list.push(m);
+  }
+
+  // بناء HTML
+  let html = '';
+  let idx  = 0;
+  for (const [, g] of groups) {
+    const gid = `g${idx++}`;
+    html += `
+      <div class="league-header" onclick="toggleGroup('${gid}', this)" data-gid="${gid}">
+        <div class="league-header-left">
+          <span class="l-flag">${g.flag}</span>
+          <span class="l-name">${g.name}</span>
+          ${g.year ? `<span class="l-year">${g.year}</span>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:0.4rem">
+          ${g.stage ? `<span class="l-stage">${g.stage}</span>` : ''}
+          <span class="l-chevron">▼</span>
+        </div>
+      </div>
+      <div id="${gid}">
+        ${g.list.map(m => matchCard(m, g.slug)).join('')}
+      </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+// ─── طيّ/نشر مجموعة البطولة ──────────────────────────────────────
+function toggleGroup(gid, header) {
+  const el = document.getElementById(gid);
+  const collapsed = el.classList.toggle('hidden');
+  header.classList.toggle('collapsed', collapsed);
+}
+
+// ─── بطاقة مباراة واحدة ───────────────────────────────────────────
+function matchCard(m, leagueSlug) {
+  const isLive = m.status === 'in';
+  const isPre  = m.status === 'pre';
+
+  const scoreOrTime = isPre
+    ? `<span class="score-time">${toTimeStr(m.date)}</span>`
+    : `<div class="score-box ${isLive ? 'live' : ''}">${m.homeScore ?? 0} - ${m.awayScore ?? 0}</div>`;
+
+  const badge = isLive
+    ? `<span class="status-badge badge-live">🔴 ${m.minute || 'LIVE'}</span>`
+    : isPre
+      ? `<span class="status-badge badge-pre">قادمة</span>`
+      : `<span class="status-badge badge-post">انتهت</span>`;
+
+  // ✅ m.league = slug (fifa.world, eng.1...) للـ API
+  // ✅ m.leagueId = رقم للتجميع فقط
+  const href = `match.html?id=${m.id}&league=${m.league || leagueSlug}`;
+
+  return `
+<div class="match-card${isLive ? ' live' : ''}" onclick="location.href='${href}'">
+  <div class="team-block">
+    ${m.homeLogo ? `<img class="team-logo" src="${m.homeLogo}" alt="" onerror="this.style.display='none'">` : ''}
+    <div class="team-name">${m.homeTeam}</div>
+  </div>
+  <div class="match-mid">
+    ${scoreOrTime}
+    ${badge}
+  </div>
+  <div class="team-block">
+    ${m.awayLogo ? `<img class="team-logo" src="${m.awayLogo}" alt="" onerror="this.style.display='none'">` : ''}
+    <div class="team-name">${m.awayTeam}</div>
+  </div>
+</div>`;
+}
+
+// ─── فلاتر الحالة ─────────────────────────────────────────────────
+document.querySelectorAll('.stab').forEach(btn => {
+  btn.onclick = () => {
+    activeFilter = btn.dataset.f;
+    document.querySelectorAll('.stab').forEach(b => b.classList.toggle('active', b === btn));
+    renderMatches();
+  };
+});
+
+// ─── أزرار التاريخ ────────────────────────────────────────────────
+function refreshDate() {
+  document.getElementById('btn-date').textContent = toDisplayDate(currentDate);
+  allMatches = [];
+  loadMatches();
+}
+document.getElementById('btn-prev').onclick = () => { currentDate.setDate(currentDate.getDate()-1); refreshDate(); };
+document.getElementById('btn-next').onclick = () => { currentDate.setDate(currentDate.getDate()+1); refreshDate(); };
+document.getElementById('btn-date').onclick = () => { currentDate = new Date(); refreshDate(); };
+
+// ─── التنقل السفلي ────────────────────────────────────────────────
+document.getElementById('nav-leagues').onclick = () => location.href = 'league.html';
+
+// ─── تشغيل أولي ───────────────────────────────────────────────────
+document.getElementById('btn-date').textContent = toDisplayDate(currentDate);
+loadMatches();
+</script>
+</body>
+</html>
