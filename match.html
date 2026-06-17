@@ -9,7 +9,7 @@
     :root{
       --bg:#0d1117;--bg2:#161b22;--bg3:#1f2a3e;--bg4:#0d1f33;
       --border:#30363d;--text:#e6edf3;--text2:#8b949e;
-      --green:#4ade80;--red:#e63946;--blue:#58a6ff;--yellow:#f59e0b;--orange:#f97316;
+      --green:#4ade80;--red:#e63946;--blue:#58a6ff;--yellow:#f59e0b;
     }
     body{font-family:'Segoe UI','Cairo',sans-serif;background:var(--bg);color:var(--text);max-width:650px;margin:0 auto;padding-bottom:2rem}
 
@@ -21,7 +21,7 @@
     /* ── Hero ── */
     .hero{background:var(--bg2);padding:.9rem 1rem 1rem;border-bottom:1px solid var(--border)}
     .hero-league{text-align:center;font-size:.72rem;color:var(--text2);margin-bottom:.6rem}
-    .hero-venue{text-align:center;font-size:.68rem;color:var(--text2);margin-top:.5rem;display:flex;align-items:center;justify-content:center;gap:.3rem}
+    .hero-venue{text-align:center;font-size:.68rem;color:var(--text2);margin-top:.55rem}
     .hero-teams{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin:.6rem 0 0}
     .hero-team{flex:1;text-align:center}
     .hero-logo{width:54px;height:54px;object-fit:contain;margin-bottom:.35rem;display:block;margin-left:auto;margin-right:auto}
@@ -43,20 +43,18 @@
 
     /* ── Events ── */
     .ev-row{display:flex;align-items:flex-start;gap:.6rem;padding:.65rem .9rem;border-bottom:1px solid var(--border)}
-    .ev-min{min-width:44px;font-size:.75rem;font-weight:800;color:var(--text2);padding-top:.1rem}
+    .ev-min{min-width:50px;font-size:.75rem;font-weight:800;color:var(--text2);padding-top:.1rem;text-align:left}
     .ev-icon{font-size:1rem;flex-shrink:0;padding-top:.05rem}
     .ev-body{flex:1}
     .ev-player{font-weight:700;font-size:.88rem}
-    .ev-assist{font-size:.72rem;color:var(--text2);margin-top:.1rem}
     .ev-meta{display:flex;align-items:center;gap:.4rem;margin-top:.18rem;flex-wrap:wrap}
     .ev-team{font-size:.68rem;color:var(--text2)}
     .ev-badge{font-size:.62rem;font-weight:700;padding:.1rem .38rem;border-radius:4px}
     .badge-pk{background:rgba(88,166,255,.2);color:var(--blue)}
     .badge-og{background:rgba(230,57,70,.2);color:var(--red)}
-    .badge-sub-in{background:rgba(74,222,128,.2);color:var(--green)}
-    .badge-sub-out{background:rgba(230,57,70,.15);color:var(--red)}
-    .no-events{text-align:center;padding:1.5rem;color:var(--text2);font-size:.85rem}
-    .sec-label{padding:.45rem .9rem;background:var(--bg3);font-size:.7rem;font-weight:700;color:var(--text2);letter-spacing:.5px}
+    .ev-assist{font-size:.72rem;color:var(--text2)}
+    .no-events{text-align:center;padding:1.2rem;color:var(--text2);font-size:.82rem}
+    .sec-label{padding:.45rem .9rem;background:var(--bg3);font-size:.7rem;font-weight:700;color:var(--text2);letter-spacing:.5px;display:flex;justify-content:space-between;align-items:center}
 
     /* ── Lineup / Pitch ── */
     .fm-switcher{display:flex;gap:.5rem;padding:.65rem .8rem;border-bottom:1px solid var(--border);background:var(--bg2)}
@@ -78,21 +76,19 @@
     .player-item{display:flex;flex-direction:column;align-items:center;gap:3px}
     .jersey-wrap{position:relative;display:flex;align-items:center;justify-content:center}
     .p-badge{position:absolute;top:-5px;right:-7px;width:15px;height:15px;border-radius:50%;font-size:8.5px;display:flex;align-items:center;justify-content:center;font-weight:900;border:1px solid var(--bg)}
-    .badge-y{background:var(--yellow);color:#000}
-    .badge-r{background:var(--red);color:#fff}
+    .badge-yc{background:var(--yellow);color:#000}
+    .badge-rc{background:var(--red);color:#fff}
     .badge-sin{background:var(--green);color:#000}
     .badge-sout{background:var(--red);color:#fff}
     .player-tag{background:rgba(0,0,0,.68);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;white-space:nowrap;max-width:64px;overflow:hidden;text-overflow:ellipsis;text-align:center}
 
-    /* ── Subs section ── */
-    .subs-wrap{margin-top:.3rem}
+    /* ── Subs in lineup tab ── */
     .sub-row{display:flex;align-items:center;gap:.5rem;padding:.55rem .9rem;border-bottom:1px solid var(--border)}
+    .sub-min{min-width:44px;font-size:.75rem;font-weight:800;color:var(--blue);flex-shrink:0}
     .sub-pair{flex:1}
-    .sub-in,.sub-out{display:flex;align-items:center;gap:.38rem;font-size:.8rem}
-    .sub-in{color:var(--green);font-weight:700}
-    .sub-out{color:var(--text2);margin-top:.15rem}
-    .sub-arr{font-size:.85rem;flex-shrink:0}
-    .sub-jno{font-size:.7rem;color:var(--text2)}
+    .sub-in{display:flex;align-items:center;gap:.38rem;font-size:.82rem;color:var(--green);font-weight:700}
+    .sub-out{display:flex;align-items:center;gap:.38rem;font-size:.78rem;color:var(--text2);margin-top:.12rem}
+    .sub-jno{font-size:.68rem;color:var(--text2)}
 
     /* ── Stats ── */
     .stat-item{padding:.6rem .9rem;border-bottom:1px solid var(--border)}
@@ -124,7 +120,7 @@ const WORKER = 'https://football-worker.mahdijadir38.workers.dev';
 /* ═══ POSITION CATEGORY ═════════════════════════════════════════════ */
 function posCat(abbr) {
   const b = (abbr || '').toUpperCase().split('-')[0].split(' ')[0];
-  if (['G','GK'].includes(b))                                         return 'gk';
+  if (['G','GK'].includes(b)) return 'gk';
   if (['CB','CD','LCB','RCB','LB','RB','LWB','RWB','SW','DC','DL','DR','D'].includes(b)) return 'def';
   if (['ST','CF','FW','LW','RW','SS','FO','ATT','LF','RF','FWD'].includes(b)) return 'fwd';
   return 'mid';
@@ -145,18 +141,19 @@ function shade(hex, p) {
 function jersey(num, isGK, color) {
   const fill  = isGK ? '#555' : color;
   const dark  = shade(fill, -28);
-  const fs    = String(num||'?').length > 2 ? '8' : String(num||'?').length > 1 ? '11' : '13';
+  const s     = String(num||'?');
+  const fs    = s.length > 2 ? '8' : s.length > 1 ? '11' : '13';
   return `<svg viewBox="0 0 44 42" width="40" height="37" xmlns="http://www.w3.org/2000/svg">
     <path d="M8,3 L0,13 L8,17.5 L8,39 L36,39 L36,17.5 L44,13 L36,3 Q29,9 22,9 Q15,9 8,3 Z" fill="${fill}"/>
     <path d="M8,3 L8,17.5 L12,19.5 Q22,23 32,19.5 L36,17.5 L36,3 Q29,9 22,9 Q15,9 8,3 Z" fill="${dark}" opacity=".22"/>
     <path d="M15.5,4 Q22,11 28.5,4" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
-    <text x="22" y="30" text-anchor="middle" fill="white" font-size="${fs}px" font-weight="900" font-family="Arial,sans-serif">${num||'?'}</text>
+    <text x="22" y="30" text-anchor="middle" fill="white" font-size="${fs}px" font-weight="900" font-family="Arial,sans-serif">${s}</text>
   </svg>`;
 }
 
-/* ═══ BUILD & RENDER PITCH ══════════════════════════════════════════ */
+/* ═══ BUILD ROWS FOR PITCH ══════════════════════════════════════════ */
 function buildRows(starters, formation) {
-  const gks  = starters.filter(p => posCat(p.position) === 'gk');
+  const gks = starters.filter(p => posCat(p.position) === 'gk');
   const out  = starters.filter(p => posCat(p.position) !== 'gk');
   const nums = (formation||'').split('-').map(Number).filter(n=>n>0);
   if (nums.length && nums.reduce((a,b)=>a+b,0) === out.length) {
@@ -170,21 +167,28 @@ function buildRows(starters, formation) {
   return [gks,def,mid,fwd].filter(r=>r.length);
 }
 
-function renderPitch(lineup, formation, color) {
+/* ═══ RENDER PITCH ══════════════════════════════════════════════════ */
+function renderPitch(lineup, formation, color, cards) {
   const el = document.getElementById('pitch-players');
   if (!el) return;
+  // بناء خريطة البطاقات حسب اسم اللاعب
+  const yellowSet = new Set((cards||[]).filter(c=>c.type==='yellowCard').map(c=>c.player));
+  const redSet    = new Set((cards||[]).filter(c=>c.type==='redCard'||c.type==='yellowRedCard').map(c=>c.player));
+
   const starters = lineup.filter(p=>p.starter);
   const rows     = buildRows(starters, formation);
   el.innerHTML   = '';
-  [...rows].reverse().forEach(row => {
+  ;[...rows].reverse().forEach(row => {
     if (!row.length) return;
     const div = document.createElement('div');
     div.className = 'pitch-row';
     row.forEach(p => {
       const gk = posCat(p.position)==='gk';
       let badges = '';
-      if (p.subbedOut) badges += '<span class="p-badge badge-sout">▼</span>';
-      if (p.subbedIn)  badges += '<span class="p-badge badge-sin">▲</span>';
+      if (redSet.has(p.name))    badges += '<span class="p-badge badge-rc">🟥</span>';
+      else if (yellowSet.has(p.name)) badges += '<span class="p-badge badge-yc">🟨</span>';
+      if (p.subbedOut) badges += '<span class="p-badge badge-sout" style="left:-7px;right:auto">▼</span>';
+      if (p.subbedIn)  badges += '<span class="p-badge badge-sin" style="left:-7px;right:auto">▲</span>';
       const tag = p.shortName || p.name.split(' ').slice(-1)[0] || p.name;
       div.innerHTML += `<div class="player-item">
         <div class="jersey-wrap">${jersey(p.jersey,gk,color)}${badges}</div>
@@ -195,16 +199,17 @@ function renderPitch(lineup, formation, color) {
   });
 }
 
-/* ═══ RENDER SUBS ════════════════════════════════════════════════════ */
+/* ═══ RENDER SUBS (with minute) ═════════════════════════════════════ */
 function renderSubs(subs, elId) {
   const el = document.getElementById(elId);
   if (!el) return;
   if (!subs?.length) { el.innerHTML = '<div class="no-events">لا توجد تبديلات</div>'; return; }
-  el.innerHTML = subs.map(s=>`
+  el.innerHTML = subs.map(s => `
     <div class="sub-row">
+      <span class="sub-min">${s.minute ? s.minute : '—'}</span>
       <div class="sub-pair">
-        <div class="sub-in"><span class="sub-arr">▲</span><span class="sub-jno">#${s.jerseyIn||'?'}</span> ${s.playerIn||'—'}</div>
-        <div class="sub-out"><span class="sub-arr">▼</span><span class="sub-jno">#${s.jerseyOut||'?'}</span> ${s.playerOut||'—'}</div>
+        <div class="sub-in">▲ <span class="sub-jno">#${s.jerseyIn||'?'}</span> ${s.playerIn||'—'}</div>
+        <div class="sub-out">▼ <span class="sub-jno">#${s.jerseyOut||'?'}</span> ${s.playerOut||'—'}</div>
       </div>
     </div>`).join('');
 }
@@ -214,11 +219,16 @@ let G = null;
 
 function showTeam(side) {
   if (!G) return;
-  const isHome = side==='home';
+  const isHome = side === 'home';
   document.getElementById('btn-home').classList.toggle('active', isHome);
   document.getElementById('btn-away').classList.toggle('active', !isHome);
-  renderPitch(isHome?G.homeLineup:G.awayLineup, isHome?G.homeFormation:G.awayFormation, isHome?'#3b82f6':'#ef4444');
-  renderSubs(isHome?G.homeSubs:G.awaySubs, 'subs-list');
+  renderPitch(
+    isHome ? G.homeLineup : G.awayLineup,
+    isHome ? G.homeFormation : G.awayFormation,
+    isHome ? '#3b82f6' : '#ef4444',
+    G.cards
+  );
+  renderSubs(isHome ? G.homeSubs : G.awaySubs, 'subs-list');
 }
 
 function switchTab(id, btn) {
@@ -228,59 +238,58 @@ function switchTab(id, btn) {
   btn.classList.add('active');
 }
 
-/* ═══ GOAL TYPE LABEL ════════════════════════════════════════════════ */
+/* ═══ GOAL TYPE BADGE ═══════════════════════════════════════════════ */
 function goalBadge(type) {
-  if (type==='penalty') return '<span class="ev-badge badge-pk">ر.جزاء</span>';
-  if (type==='ownGoal') return '<span class="ev-badge badge-og">هدف عكسي</span>';
+  if (type === 'penalty') return '<span class="ev-badge badge-pk">ر.جزاء</span>';
+  if (type === 'ownGoal') return '<span class="ev-badge badge-og">هدف عكسي</span>';
   return '';
 }
 
 /* ═══ MAIN LOAD ══════════════════════════════════════════════════════ */
 async function loadMatch() {
   const p = new URLSearchParams(location.search);
-  const id = p.get('id'), lg = p.get('league')||'';
+  const id = p.get('id'), lg = p.get('league') || '';
   if (!id) { document.getElementById('root').innerHTML='<div class="loading">❌ معرف المباراة غير موجود</div>'; return; }
-
   try {
     const res  = await fetch(`${WORKER}/api/summary?matchId=${id}&league=${lg}`);
     const data = await res.json();
-    if (!data||data.error) throw new Error(data?.error||'فشل التحميل');
+    if (!data || data.error) throw new Error(data?.error || 'فشل التحميل');
     G = data;
     render(data);
   } catch(e) {
-    document.getElementById('root').innerHTML=`<div class="loading">❌ ${e.message}</div>`;
+    document.getElementById('root').innerHTML = `<div class="loading">❌ ${e.message}</div>`;
   }
 }
 
 /* ═══ RENDER ══════════════════════════════════════════════════════════ */
 function render(d) {
-  const isLive = d.status==='in';
-  const isPre  = d.status==='pre';
+  const isLive = d.status === 'in';
+  const isPre  = d.status === 'pre';
 
-  /* Score / shootout */
   const scoreHtml = isPre
     ? `<span style="font-size:1rem;color:var(--text2)">vs</span>`
     : `<div class="hero-score${isLive?' live':''}">${d.homeScore??0} - ${d.awayScore??0}</div>`;
-  const shootoutHtml = (d.homeShootout!=null && d.awayShootout!=null)
-    ? `<div class="hero-shootout">(${d.homeShootout} - ${d.awayShootout} ر.ت)</div>`
-    : '';
+
+  const shootoutHtml = (d.homeShootout != null && d.awayShootout != null)
+    ? `<div class="hero-shootout">(${d.homeShootout} - ${d.awayShootout} ر.ت)</div>` : '';
+
   const statusHtml = isPre
     ? '⏱️ لم تبدأ'
-    : isLive ? `<span class="live-pill">🔴 ${d.minute||'LIVE'}</span>`
-    : `✅ ${d.statusText||'انتهت'}`;
+    : isLive
+      ? `<span class="live-pill">🔴 ${d.minute||'LIVE'}</span>`
+      : `✅ ${d.statusText||'انتهت'}`;
+
   const advancesHtml = d.advancesNote
     ? `<div class="advances-bar">🏆 ${d.advancesNote}</div>` : '';
 
-  /* Venue */
   const venueHtml = d.venue
     ? `<div class="hero-venue">🏟️ ${d.venue}</div>` : '';
 
-  /* League / group */
   const leagueDisplay = [d.leagueName, d.leagueGroup].filter(Boolean).join(' · ');
 
-  /* ─ Goals HTML ─ */
+  /* ─ Goals ─ */
   const goalsHtml = (d.goals||[]).length
-    ? (d.goals.map(g=>`
+    ? d.goals.map(g => `
         <div class="ev-row">
           <span class="ev-min">${g.minute||''}</span>
           <span class="ev-icon">⚽</span>
@@ -292,45 +301,34 @@ function render(d) {
               ${g.assist ? `<span class="ev-assist">تمريرة: ${g.assist}</span>` : ''}
             </div>
           </div>
-        </div>`).join(''))
+        </div>`).join('')
     : '<div class="no-events">لا توجد أهداف</div>';
 
-  /* ─ Cards HTML ─ */
+  /* ─ Cards ─ */
   const cardsHtml = (d.cards||[]).length
-    ? (d.cards.map(c=>`
-        <div class="ev-row">
+    ? d.cards.map(c => {
+        const icon = c.type === 'redCard' ? '🟥' : c.type === 'yellowRedCard' ? '🟥🟨' : '🟨';
+        return `<div class="ev-row">
           <span class="ev-min">${c.minute||'—'}</span>
-          <span class="ev-icon">${c.type==='redCard'?'🟥':'🟨'}</span>
+          <span class="ev-icon">${icon}</span>
           <div class="ev-body">
             <div class="ev-player">${c.player||'—'}</div>
             <div class="ev-meta"><span class="ev-team">${c.team||''}</span></div>
           </div>
-        </div>`).join(''))
+        </div>`;
+      }).join('')
     : '<div class="no-events">لا توجد بطاقات</div>';
 
-  /* ─ All subs HTML for events tab ─ */
-  const allSubs = [...(d.homeSubs||[]), ...(d.awaySubs||[])];
-  const subsEvHtml = allSubs.length
-    ? allSubs.map(s=>`
-        <div class="ev-row">
-          <span class="ev-min"></span>
-          <span class="ev-icon">🔄</span>
-          <div class="ev-body">
-            <div class="ev-player"><span style="color:var(--green)">▲ ${s.playerIn||'—'}</span></div>
-            <div class="ev-meta">
-              <span style="color:var(--text2)">▼ ${s.playerOut||'—'}</span>
-              <span class="ev-team">${s.team||''}</span>
-            </div>
-          </div>
-        </div>`).join('')
-    : '<div class="no-events">لا توجد تبديلات</div>';
+  /* ─ Formation labels ─ */
+  const fmHome = d.homeFormation ? ` (${d.homeFormation})` : '';
+  const fmAway = d.awayFormation ? ` (${d.awayFormation})` : '';
 
-  /* ─ Stats HTML ─ */
+  /* ─ Stats ─ */
   const statsHtml = (d.homeStats||[]).length
-    ? d.homeStats.map((s,i)=>{
-        const as=d.awayStats?.[i];
-        const hv=parseFloat(s.value)||0, av=parseFloat(as?.value)||0;
-        const tot=hv+av||1, hp=Math.round(hv/tot*100);
+    ? d.homeStats.map((s,i) => {
+        const as = d.awayStats?.[i];
+        const hv = parseFloat(s.value)||0, av = parseFloat(as?.value)||0;
+        const tot = hv+av||1, hp = Math.round(hv/tot*100);
         return `<div class="stat-item">
           <div class="stat-row">
             <span class="stat-h">${s.value}</span>
@@ -343,17 +341,13 @@ function render(d) {
       }).join('')
     : '<div class="no-events">لا توجد إحصائيات</div>';
 
-  /* ─ Formation buttons ─ */
-  const fmHome = d.homeFormation ? ` (${d.homeFormation})` : '';
-  const fmAway = d.awayFormation ? ` (${d.awayFormation})` : '';
-
   document.getElementById('root').innerHTML = `
     <!-- HERO -->
     <div class="hero">
       <div class="hero-league">${leagueDisplay||''}</div>
       <div class="hero-teams">
         <div class="hero-team">
-          ${d.homeLogo?`<img class="hero-logo" src="${d.homeLogo}" onerror="this.style.display='none'">`:'<div style="width:54px;height:54px"></div>'}
+          ${d.homeLogo ? `<img class="hero-logo" src="${d.homeLogo}" onerror="this.style.display='none'">` : '<div style="height:54px"></div>'}
           <div class="hero-name">${d.homeTeam}</div>
         </div>
         <div class="hero-center">
@@ -361,7 +355,7 @@ function render(d) {
           ${shootoutHtml}
         </div>
         <div class="hero-team">
-          ${d.awayLogo?`<img class="hero-logo" src="${d.awayLogo}" onerror="this.style.display='none'">`:'<div style="width:54px;height:54px"></div>'}
+          ${d.awayLogo ? `<img class="hero-logo" src="${d.awayLogo}" onerror="this.style.display='none'">` : '<div style="height:54px"></div>'}
           <div class="hero-name">${d.awayTeam}</div>
         </div>
       </div>
@@ -377,17 +371,15 @@ function render(d) {
       <button class="tab" onclick="switchTab('stats',this)">📊 إحصائيات</button>
     </div>
 
-    <!-- EVENTS TAB -->
+    <!-- EVENTS TAB: goals + cards only (no subs) -->
     <div class="tab-panel active" id="panel-events">
-      <div class="sec-label">⚽ الأهداف</div>
+      <div class="sec-label"><span>⚽ الأهداف</span></div>
       ${goalsHtml}
-      <div class="sec-label">🟨 البطاقات</div>
+      <div class="sec-label"><span>🟨 البطاقات</span></div>
       ${cardsHtml}
-      <div class="sec-label">🔄 التبديلات</div>
-      ${subsEvHtml}
     </div>
 
-    <!-- LINEUP TAB -->
+    <!-- LINEUP TAB: pitch + subs WITH time -->
     <div class="tab-panel" id="panel-lineup">
       <div class="fm-switcher">
         <button class="fm-btn active" id="btn-home" onclick="showTeam('home')">
@@ -407,15 +399,13 @@ function render(d) {
           <div id="pitch-players" style="display:flex;flex-direction:column;gap:10px;position:relative;z-index:1;flex:1"></div>
         </div>
       </div>
-      <div class="subs-wrap">
-        <div class="sec-label">🔄 التبديلات</div>
-        <div id="subs-list"></div>
-      </div>
+      <div class="sec-label"><span>🔄 التبديلات</span></div>
+      <div id="subs-list"></div>
     </div>
 
     <!-- STATS TAB -->
     <div class="tab-panel" id="panel-stats">
-      <div class="sec-label" style="display:flex;justify-content:space-between">
+      <div class="sec-label">
         <span style="color:var(--blue)">${d.homeTeam}</span>
         <span></span>
         <span style="color:var(--red)">${d.awayTeam}</span>
@@ -424,7 +414,7 @@ function render(d) {
     </div>
   `;
 
-  requestAnimationFrame(()=>showTeam('home'));
+  requestAnimationFrame(() => showTeam('home'));
 }
 
 loadMatch();
