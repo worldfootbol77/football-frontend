@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>البطولات - Scorio</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#0d1117;--bg2:#161b22;--bg3:#1f2a3e;
+      --border:#30363d;--text:#e6edf3;--text2:#8b949e;
+      --green:#4ade80;--red:#e63946;--blue:#58a6ff;--yellow:#f59e0b;
+    }
+    body{font-family:'Segoe UI','Cairo',sans-serif;background:var(--bg);color:var(--text);max-width:650px;margin:0 auto;padding-bottom:70px}
+
+    /* ── Header ── */
+    .app-header{background:var(--bg2);padding:.7rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+    .app-logo{font-size:1.15rem;font-weight:900;color:var(--blue)}
+    .app-logo span{color:var(--text2);font-weight:400;font-size:.75rem;margin-right:.4rem}
+
+    /* ── League Selector ── */
+    .league-selector{padding:.65rem .8rem;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:45px;z-index:190}
+    .league-select-btn{
+      width:100%;display:flex;align-items:center;justify-content:space-between;
+      background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+      padding:.55rem .85rem;cursor:pointer;color:var(--text);font-family:inherit;font-size:.88rem;font-weight:700
+    }
+    .league-select-btn .flag{margin-left:.5rem;font-size:1.1rem}
+    .league-select-btn .arrow{color:var(--text2);font-size:.75rem;transition:transform .2s}
+    .league-select-btn.open .arrow{transform:rotate(180deg)}
+
+    .league-dropdown{
+      display:none;position:absolute;right:.8rem;left:.8rem;top:calc(100% + .3rem);
+      background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+      z-index:300;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.5);max-height:65vh;overflow-y:auto
+    }
+    .league-dropdown.open{display:block}
+    .lg-group-title{padding:.45rem .85rem;font-size:.68rem;font-weight:900;color:var(--text2);background:var(--bg3);letter-spacing:.5px;border-bottom:1px solid var(--border)}
+    .lg-option{
+      display:flex;align-items:center;gap:.7rem;padding:.55rem .85rem;
+      cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s
+    }
+    .lg-option:last-child{border-bottom:none}
+    .lg-option:active,.lg-option.selected{background:var(--bg3)}
+    .lg-option .lg-flag{font-size:1.1rem;flex-shrink:0}
+    .lg-option .lg-name{font-size:.85rem;font-weight:700}
+
+    /* ── Tabs ── */
+    .tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:116px;z-index:180}
+    .tab{flex:1;padding:.65rem .3rem;text-align:center;background:none;border:none;color:var(--text2);font-weight:700;font-size:.85rem;cursor:pointer;border-bottom:2.5px solid transparent;font-family:inherit;transition:color .2s}
+    .tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+    .tab-panel{display:none}
+    .tab-panel.active{display:block}
+
+    /* ── Standings Table ── */
+    .standings-header{display:grid;grid-template-columns:32px 1fr 36px 36px 36px 36px 52px;gap:0;padding:.45rem .65rem;background:var(--bg3);font-size:.68rem;font-weight:700;color:var(--text2);border-bottom:1px solid var(--border)}
+    .standings-row{display:grid;grid-template-columns:32px 1fr 36px 36px 36px 36px 52px;gap:0;padding:.55rem .65rem;border-bottom:1px solid var(--border);align-items:center;transition:background .15s}
+    .standings-row:last-child{border-bottom:none}
+    .standings-row:active{background:var(--bg3)}
+    .standings-row.promoted{border-right:3px solid var(--blue)}
+    .standings-row.relegated{border-right:3px solid var(--red)}
+    .standings-row.champions-league{border-right:3px solid #a855f7}
+    .st-rank{font-size:.78rem;font-weight:900;color:var(--text2);text-align:center}
+    .st-team{display:flex;align-items:center;gap:.45rem}
+    .st-logo{width:22px;height:22px;object-fit:contain;flex-shrink:0}
+    .st-name{font-size:.82rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .st-num{font-size:.8rem;font-weight:700;text-align:center}
+    .st-pts{font-size:.88rem;font-weight:900;text-align:center;color:var(--text)}
+
+    /* ── Top Scorers ── */
+    .scorer-row{display:flex;align-items:center;gap:.7rem;padding:.6rem .85rem;border-bottom:1px solid var(--border);transition:background .15s}
+    .scorer-row:last-child{border-bottom:none}
+    .sc-rank{min-width:26px;font-size:.82rem;font-weight:900;color:var(--text2);text-align:center}
+    .sc-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--bg3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .sc-info{flex:1;overflow:hidden}
+    .sc-name{font-size:.88rem;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .sc-team{font-size:.7rem;color:var(--text2);margin-top:.1rem;display:flex;align-items:center;gap:.35rem}
+    .sc-team-logo{width:14px;height:14px;object-fit:contain}
+    .sc-goals{background:var(--blue);color:#fff;border-radius:8px;padding:.2rem .6rem;font-size:.82rem;font-weight:900;min-width:34px;text-align:center;flex-shrink:0}
+
+    /* ── Loading / Error ── */
+    .loading{text-align:center;padding:3rem;color:var(--text2)}
+    .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .empty{text-align:center;padding:2rem;color:var(--text2);font-size:.88rem}
+
+    /* ── Legend ── */
+    .legend{display:flex;flex-wrap:wrap;gap:.5rem 1rem;padding:.55rem .8rem;background:var(--bg2);border-bottom:1px solid var(--border)}
+    .leg-item{display:flex;align-items:center;gap:.35rem;font-size:.65rem;color:var(--text2)}
+    .leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+    /* ── Bottom Nav ── */
+    .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);max-width:650px;width:100%;background:var(--bg2);border-top:1px solid var(--border);display:flex;z-index:300}
+    .nav-item{flex:1;text-align:center;padding:.55rem .3rem;background:none;border:none;color:var(--text2);font-weight:700;cursor:pointer;font-size:.78rem;font-family:inherit;transition:color .2s}
+    .nav-item.active{color:var(--blue)}
+    .nav-icon{font-size:1.1rem;display:block;margin-bottom:.1rem}
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="app-header">
+  <div class="app-logo">⚽ Scorio <span>البطولات</span></div>
+</div>
+
+<!-- LEAGUE SELECTOR -->
+<div class="league-selector" id="leagueSelector">
+  <button class="league-select-btn" id="selectBtn" onclick="toggleDropdown()">
+    <span>
+      <span class="flag" id="selectedFlag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
+      <span id="selectedName">الدوري الإنجليزي الممتاز</span>
+    </span>
+    <span class="arrow">▼</span>
+  </button>
+  <div class="league-dropdown" id="leagueDropdown">
+    <div class="lg-group-title">أوروبا</div>
+    <div class="lg-option" onclick="selectLeague('eng.1','🏴󠁧󠁢󠁥󠁮󠁧󠁿','الدوري الإنجليزي الممتاز',this)">
+      <span class="lg-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span><span class="lg-name">الدوري الإنجليزي الممتاز</span>
+    </div>
+    <div class="lg-option" onclick="selectLeague('esp.1','🇪🇸','الليغا الإسبانية',this)">
+      <span class="lg-flag">🇪🇸</span><span class="lg-name">الليغا الإسبانية</span>
+    </div>
+    <div class="lg-option" onclick="selectLeague('ger.1','🇩🇪','الدوري الألماني',this)">
+      <span class="lg-flag">🇩🇪</span><span class="lg-name">الدوري الألماني</span>
+    </div>
+    <div class="lg-option" onclick="selectLeague('ita.1','🇮🇹','الدوري الإيطالي',this)">
+      <span class="lg-flag">🇮🇹</span><span class="lg-name">الدوري الإيطالي</span>
+    </div>
+    <div class="lg-option" onclick="selectLeague('fra.1','🇫🇷','الدوري الفرنسي',this)">
+      <span class="lg-flag">🇫🇷</span><span class="lg-name">الدوري الفرنسي</span>
+    </div>
+    <div class="lg-option" onclick="selectLeague('por.1','🇵🇹','الدوري البرتغالي',this)">
+      <span class="lg-flag">🇵🇹</span><span class="lg-name">الدوري البرتغالي</span>
+    </div>
+    <div class="lg-option" onclick="selectLeague('ned.1','🇳🇱','الدوري الهولندي',this)">
+      <span class="lg-flag">🇳🇱</span><span class="lg-name">الدوري الهولندي</span>
+    </div>
+    <div class="lg-option" onclick="selectLeague('eng.2','🏴󠁧󠁢󠁥󠁮󠁧󠁿','دوري المقاعدة الإنجليزي',this)">
+      <span class="lg-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span><span class="lg-name">دوري المقاعدة الإنجليزي</span>
+    </div>
+    <div class="lg-group-title">أوروبا (الكؤوس)</div>
+    <div class="lg-option" onclick="selectLeague('uefa.champions','🏆','دوري أبطال أوروبا',this)">
+      <span class="lg-flag">🏆</span><span class="lg-name">دوري أبطال أوروبا</span>
+    </div>
+    <div class="lg-option" onclick="selectLeague('uefa.europa','🏆','الدوري الأوروبي',this)">
+      <span class="lg-flag">🏆</span><span class="lg-name">الدوري الأوروبي</span>
+    </div>
+    <div class="lg-group-title">العرب</div>
+    <div class="lg-option" onclick="selectLeague('sau.1','🇸🇦','الدوري السعودي للمحترفين',this)">
+      <span class="lg-flag">🇸🇦</span><span class="lg-name">الدوري السعودي للمحترفين</span>
+    </div>
+    <div class="lg-option" onclick="selectLeague('egy.1','🇪🇬','الدوري المصري الممتاز',this)">
+      <span class="lg-flag">🇪🇬</span><span class="lg-name">الدوري المصري الممتاز</span>
+    </div>
+    <div class="lg-option" onclick="selectLeague('uae.league','🇦🇪','دوري ADNOC الإماراتي',this)">
+      <span class="lg-flag">🇦🇪</span><span class="lg-name">دوري ADNOC الإماراتي</span>
+    </div>
+    <div class="lg-option" onclick="selectLeague('mar.1','🇲🇦','الدوري المغربي',this)">
+      <span class="lg-flag">🇲🇦</span><span class="lg-name">الدوري المغربي</span>
+    </div>
+    <div class="lg-group-title">أمريكا اللاتينية</div>
+    <div class="lg-option" onclick="selectLeague('bra.1','🇧🇷','الدوري البرازيلي',this)">
+      <span class="lg-flag">🇧🇷</span><span class="lg-name">الدوري البرازيلي الممتاز</span>
+    </div>
+    <div class="lg-option" onclick="selectLeague('arg.1','🇦🇷','الدوري الأرجنتيني',this)">
+      <span class="lg-flag">🇦🇷</span><span class="lg-name">الدوري الأرجنتيني</span>
+    </div>
+    <div class="lg-group-title">عالمي</div>
+    <div class="lg-option" onclick="selectLeague('fifa.world','🌍','كأس العالم',this)">
+      <span class="lg-flag">🌍</span><span class="lg-name">كأس العالم</span>
+    </div>
+    <div class="lg-option" onclick="selectLeague('fifa.cwc','🏆','كأس العالم للأندية',this)">
+      <span class="lg-flag">🏆</span><span class="lg-name">كأس العالم للأندية</span>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" id="tabStandings" onclick="switchTab('standings',this)">🏆 الترتيب</button>
+  <button class="tab" id="tabScorers" onclick="switchTab('scorers',this)">⚽ الهدافون</button>
+</div>
+
+<!-- STANDINGS -->
+<div class="tab-panel active" id="panel-standings">
+  <div class="loading" id="load-standings"><div class="spinner"></div>جارٍ التحميل...</div>
+  <div id="standings-content" style="display:none"></div>
+</div>
+
+<!-- SCORERS -->
+<div class="tab-panel" id="panel-scorers">
+  <div class="loading" id="load-scorers"><div class="spinner"></div>جارٍ التحميل...</div>
+  <div id="scorers-content" style="display:none"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-item" onclick="location.href='index.html'">
+    <span class="nav-icon">⚽</span>مباريات
+  </button>
+  <button class="nav-item active">
+    <span class="nav-icon">🏆</span>بطولات
+  </button>
+</div>
+
+<script>
+const WORKER = 'https://football-worker.mahdijadir38.workers.dev';
+
+let currentLeague = 'eng.1';
+let standingsLoaded = false;
+let scorersLoaded   = false;
+let currentTab      = 'standings';
+
+/* ═══ DROPDOWN ═══════════════════════════════════════════════════════ */
+function toggleDropdown() {
+  const dd  = document.getElementById('leagueDropdown');
+  const btn = document.getElementById('selectBtn');
+  const isOpen = dd.classList.toggle('open');
+  btn.classList.toggle('open', isOpen);
+  if (isOpen) {
+    document.addEventListener('click', closeOnOutside, true);
+  }
+}
+
+function closeOnOutside(e) {
+  const sel = document.getElementById('leagueSelector');
+  if (!sel.contains(e.target)) {
+    document.getElementById('leagueDropdown').classList.remove('open');
+    document.getElementById('selectBtn').classList.remove('open');
+    document.removeEventListener('click', closeOnOutside, true);
+  }
+}
+
+function selectLeague(code, flag, name, el) {
+  currentLeague = code;
+  document.getElementById('selectedFlag').textContent = flag;
+  document.getElementById('selectedName').textContent = name;
+  document.querySelectorAll('.lg-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('leagueDropdown').classList.remove('open');
+  document.getElementById('selectBtn').classList.remove('open');
+  document.removeEventListener('click', closeOnOutside, true);
+  standingsLoaded = false;
+  scorersLoaded   = false;
+  if (currentTab === 'standings') loadStandings();
+  else loadScorers();
+}
+
+/* ═══ TABS ══════════════════════════════════════════════════════════ */
+function switchTab(id, btn) {
+  currentTab = id;
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'standings' && !standingsLoaded) loadStandings();
+  if (id === 'scorers'   && !scorersLoaded)   loadScorers();
+}
+
+/* ═══ LOAD STANDINGS ════════════════════════════════════════════════ */
+async function loadStandings() {
+  const loadEl = document.getElementById('load-standings');
+  const contEl = document.getElementById('standings-content');
+  loadEl.style.display = 'block';
+  contEl.style.display = 'none';
+  try {
+    const res  = await fetch(`${WORKER}/api/standings?league=${currentLeague}`);
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'فشل التحميل');
+    renderStandings(data, contEl);
+    standingsLoaded = true;
+  } catch(e) {
+    loadEl.innerHTML = `<div class="empty">⚠️ خطأ: ${e.message}</div>`;
+    return;
+  }
+  loadEl.style.display = 'none';
+  contEl.style.display = 'block';
+}
+
+/* ═══ RENDER STANDINGS ══════════════════════════════════════════════ */
+function renderStandings(data, el) {
+  const groups = data.groups || [];
+  if (!groups.length) {
+    el.innerHTML = '<div class="empty">لا توجد بيانات للترتيب</div>';
+    return;
+  }
+
+  let html = '';
+  for (const grp of groups) {
+    if (grp.name) {
+      html += `<div style="padding:.45rem .85rem;background:var(--bg3);font-size:.72rem;font-weight:900;color:var(--text2);border-bottom:1px solid var(--border)">${grp.name}</div>`;
+    }
+    html += `
+      <div class="standings-header">
+        <div style="text-align:center">#</div>
+        <div>الفريق</div>
+        <div style="text-align:center">لع</div>
+        <div style="text-align:center">ف</div>
+        <div style="text-align:center">ت</div>
+        <div style="text-align:center">خ</div>
+        <div style="text-align:center">نق</div>
+      </div>`;
+    for (const team of (grp.teams || [])) {
+      const rankColor = team.rank <= 4 ? 'champions-league' : team.rank >= (grp.teams.length - 2) ? 'relegated' : '';
+      html += `
+        <div class="standings-row ${rankColor}">
+          <div class="st-rank">${team.rank}</div>
+          <div class="st-team">
+            ${team.logo ? `<img class="st-logo" src="${team.logo}" onerror="this.style.display='none'">` : '<div class="st-logo"></div>'}
+            <span class="st-name">${team.name}</span>
+          </div>
+          <div class="st-num">${team.played??'-'}</div>
+          <div class="st-num" style="color:var(--green)">${team.wins??'-'}</div>
+          <div class="st-num" style="color:var(--yellow)">${team.draws??'-'}</div>
+          <div class="st-num" style="color:var(--red)">${team.losses??'-'}</div>
+          <div class="st-pts">${team.points??'-'}</div>
+        </div>`;
+    }
+  }
+
+  html += `
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#a855f7"></div>دوري الأبطال</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>هبوط</div>
+    </div>`;
+
+  el.innerHTML = html;
+}
+
+/* ═══ LOAD SCORERS ══════════════════════════════════════════════════ */
+async function loadScorers() {
+  const loadEl = document.getElementById('load-scorers');
+  const contEl = document.getElementById('scorers-content');
+  loadEl.style.display = 'block';
+  contEl.style.display = 'none';
+  try {
+    const res  = await fetch(`${WORKER}/api/scorers?league=${currentLeague}`);
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'فشل التحميل');
+    renderScorers(data.scorers || [], contEl);
+    scorersLoaded = true;
+  } catch(e) {
+    loadEl.innerHTML = `<div class="empty">⚠️ خطأ: ${e.message}</div>`;
+    return;
+  }
+  loadEl.style.display = 'none';
+  contEl.style.display = 'block';
+}
+
+/* ═══ RENDER SCORERS ════════════════════════════════════════════════ */
+function renderScorers(scorers, el) {
+  if (!scorers.length) {
+    el.innerHTML = '<div class="empty">لا توجد بيانات للهدافين</div>';
+    return;
+  }
+  el.innerHTML = scorers.map((s, i) => `
+    <div class="scorer-row">
+      <div class="sc-rank">${i + 1}</div>
+      <div class="sc-avatar">
+        ${s.photo
+          ? `<img src="${s.photo}" style="width:36px;height:36px;border-radius:50%;object-fit:cover" onerror="this.outerHTML='⚽'">`
+          : '⚽'}
+      </div>
+      <div class="sc-info">
+        <div class="sc-name">${s.name||'—'}</div>
+        <div class="sc-team">
+          ${s.teamLogo ? `<img class="sc-team-logo" src="${s.teamLogo}" onerror="this.style.display='none'">` : ''}
+          ${s.team||''}
+        </div>
+      </div>
+      <div class="sc-goals">${s.goals??0}</div>
+    </div>`).join('');
+}
+
+/* ═══ INIT ══════════════════════════════════════════════════════════ */
+loadStandings();
+</script>
+</body>
+</html>
