@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>تفاصيل المباراة - Scorio</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#0d1117;--bg2:#161b22;--bg3:#1f2a3e;--bg4:#0d1f33;
+      --border:#30363d;--text:#e6edf3;--text2:#8b949e;
+      --green:#4ade80;--red:#e63946;--blue:#58a6ff;--yellow:#f59e0b;
+    }
+    body{font-family:'Segoe UI','Cairo',sans-serif;background:var(--bg);color:var(--text);max-width:650px;margin:0 auto;padding-bottom:2rem}
+
+    /* ── Header ── */
+    .top-bar{position:sticky;top:0;background:var(--bg2);padding:.75rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.8rem;z-index:200}
+    .back-btn{background:none;border:none;color:var(--blue);font-size:1.3rem;cursor:pointer;line-height:1}
+    .top-bar h2{font-size:1rem;font-weight:800}
+
+    /* ── Hero ── */
+    .hero{background:var(--bg2);padding:.9rem 1rem 1rem;border-bottom:1px solid var(--border)}
+    .hero-league{text-align:center;font-size:.72rem;color:var(--text2);margin-bottom:.6rem}
+    .hero-venue{text-align:center;font-size:.68rem;color:var(--text2);margin-top:.55rem}
+    .hero-teams{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;margin:.6rem 0 0}
+    .hero-team{flex:1;text-align:center}
+    .hero-logo{width:54px;height:54px;object-fit:contain;margin-bottom:.35rem;display:block;margin-left:auto;margin-right:auto}
+    .hero-name{font-weight:900;font-size:.88rem;line-height:1.25}
+    .hero-center{text-align:center;min-width:90px}
+    .hero-score{font-size:2.2rem;font-weight:900;letter-spacing:2px;line-height:1}
+    .hero-score.live{color:var(--red)}
+    .hero-shootout{font-size:.82rem;color:var(--text2);margin-top:.2rem}
+    .hero-status{text-align:center;margin-top:.5rem;font-size:.72rem;color:var(--text2)}
+    .live-pill{background:var(--red);color:#fff;padding:.18rem .55rem;border-radius:12px;font-size:.7rem;font-weight:700}
+    .advances-bar{background:linear-gradient(135deg,#1a3a1a,#1f4a1f);border:1px solid #2d7a2d;border-radius:8px;padding:.45rem .9rem;margin:.7rem 0 0;text-align:center;font-size:.78rem;font-weight:700;color:var(--green)}
+
+    /* ── Goal scorers under team logos ── */
+    .hero-scorers{margin-top:.45rem;display:flex;flex-direction:column;gap:.18rem}
+    .hero-scorer{font-size:.68rem;color:var(--text2);line-height:1.3}
+    .hero-scorer .smin{color:var(--green);font-weight:800;margin-left:.3rem}
+    .hero-scorer .og-tag{color:var(--red);font-size:.6rem}
+
+    /* ── Tabs ── */
+    .tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:80px;z-index:190}
+    .tab{flex:1;padding:.65rem .3rem;text-align:center;background:none;border:none;color:var(--text2);font-weight:700;font-size:.82rem;cursor:pointer;border-bottom:2.5px solid transparent;font-family:inherit;transition:color .2s}
+    .tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+    .tab-panel{display:none}
+    .tab-panel.active{display:block}
+
+    /* ── Event Filter Bar ── */
+    .ev-filter-bar{display:flex;gap:.4rem;padding:.5rem .7rem;border-bottom:1px solid var(--border);background:var(--bg2);overflow-x:auto;scrollbar-width:none}
+    .ev-filter-bar::-webkit-scrollbar{display:none}
+    .ev-filter{flex-shrink:0;padding:.28rem .75rem;border-radius:16px;border:1px solid var(--border);background:none;color:var(--text2);font-size:.75rem;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s}
+    .ev-filter.active{background:var(--blue);border-color:var(--blue);color:#fff}
+
+    /* ── Events timeline ── */
+    .ev-timeline{position:relative}
+    .ev-row{display:flex;align-items:flex-start;gap:.6rem;padding:.65rem .9rem;border-bottom:1px solid var(--border);transition:background .15s}
+    .ev-row:last-child{border-bottom:none}
+    .ev-min{min-width:46px;font-size:.75rem;font-weight:800;color:var(--text2);padding-top:.05rem;text-align:start}
+    .ev-icon{font-size:1rem;flex-shrink:0;width:22px;text-align:center}
+    .ev-body{flex:1}
+    .ev-player{font-weight:700;font-size:.88rem}
+    .ev-meta{display:flex;align-items:center;gap:.4rem;margin-top:.18rem;flex-wrap:wrap}
+    .ev-team{font-size:.68rem;color:var(--text2)}
+    .ev-badge{font-size:.62rem;font-weight:700;padding:.1rem .38rem;border-radius:4px}
+    .badge-pk{background:rgba(88,166,255,.2);color:var(--blue)}
+    .badge-og{background:rgba(230,57,70,.2);color:var(--red)}
+    .ev-assist{font-size:.72rem;color:var(--text2)}
+    .ev-sub-pair{flex:1;display:flex;flex-direction:column;gap:.1rem}
+    .ev-sub-in{font-size:.85rem;font-weight:700;color:var(--green)}
+    .ev-sub-out{font-size:.78rem;color:var(--text2)}
+    .ev-jno{font-size:.65rem;color:var(--text2);margin-left:.3rem}
+    .no-events{text-align:center;padding:1.5rem;color:var(--text2);font-size:.82rem}
+    .sec-label{padding:.45rem .9rem;background:var(--bg3);font-size:.7rem;font-weight:700;color:var(--text2);letter-spacing:.5px;display:flex;justify-content:space-between;align-items:center}
+
+    /* ── Lineup / Pitch ── */
+    .fm-switcher{display:flex;gap:.5rem;padding:.65rem .8rem;border-bottom:1px solid var(--border);background:var(--bg2)}
+    .fm-btn{flex:1;padding:.42rem;border-radius:8px;background:var(--bg3);border:1.5px solid var(--border);color:var(--text2);font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
+    .fm-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+    .pitch-wrap{padding:.8rem}
+    .pitch{
+      background:#2e8b2e;border:2px solid rgba(255,255,255,.38);border-radius:8px;
+      padding:14px 8px 18px;position:relative;overflow:hidden;
+      display:flex;flex-direction:column;gap:10px;min-height:340px;
+    }
+    .pitch::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(0,0,0,.055) 0,rgba(0,0,0,.055) 38px,transparent 38px,transparent 76px);pointer-events:none}
+    .p-line{position:absolute;left:8px;right:8px;top:50%;height:1px;background:rgba(255,255,255,.28);pointer-events:none}
+    .p-circle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:68px;height:68px;border:1.5px solid rgba(255,255,255,.28);border-radius:50%;pointer-events:none}
+    .p-dot{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:5px;height:5px;background:rgba(255,255,255,.4);border-radius:50%;pointer-events:none}
+    .p-box-t{position:absolute;top:0;left:50%;transform:translateX(-50%);width:55%;height:17%;border:1.5px solid rgba(255,255,255,.22);border-top:none;border-radius:0 0 4px 4px;pointer-events:none}
+    .p-box-b{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:55%;height:17%;border:1.5px solid rgba(255,255,255,.22);border-bottom:none;border-radius:4px 4px 0 0;pointer-events:none}
+    .pitch-row{display:flex;justify-content:space-evenly;align-items:center;position:relative;z-index:1;min-height:64px}
+    .player-item{display:flex;flex-direction:column;align-items:center;gap:3px}
+    .jersey-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+    .p-badge{position:absolute;top:-5px;right:-7px;width:15px;height:15px;border-radius:50%;font-size:8.5px;display:flex;align-items:center;justify-content:center;font-weight:900;border:1px solid var(--bg)}
+    .badge-yc{background:var(--yellow);color:#000}
+    .badge-rc{background:var(--red);color:#fff}
+    .badge-sin{background:var(--green);color:#000}
+    .badge-sout{background:var(--red);color:#fff}
+    .player-tag{background:rgba(0,0,0,.68);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;white-space:nowrap;max-width:64px;overflow:hidden;text-overflow:ellipsis;text-align:center}
+
+    /* ── Subs ── */
+    .sub-row{display:flex;align-items:center;gap:.5rem;padding:.55rem .9rem;border-bottom:1px solid var(--border)}
+    .sub-min{min-width:44px;font-size:.75rem;font-weight:800;color:var(--blue);flex-shrink:0}
+    .sub-pair{flex:1}
+    .sub-in{display:flex;align-items:center;gap:.38rem;font-size:.82rem;color:var(--green);font-weight:700}
+    .sub-out{display:flex;align-items:center;gap:.38rem;font-size:.78rem;color:var(--text2);margin-top:.12rem}
+    .sub-jno{font-size:.68rem;color:var(--text2)}
+
+    /* ── Stats ── */
+    .stat-item{padding:.6rem .9rem;border-bottom:1px solid var(--border)}
+    .stat-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem}
+    .stat-h,.stat-a{font-weight:800;width:44px;text-align:center;font-size:.9rem}
+    .stat-n{flex:1;text-align:center;font-size:.72rem;color:var(--text2)}
+    .bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:2px}
+    .bar-h{height:100%;background:var(--blue);float:right}
+    .bar-a{height:100%;background:var(--red)}
+
+    /* ── Breadcrumb ── */
+    .breadcrumb{background:var(--bg2);padding:.42rem .9rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.35rem;flex-wrap:wrap;overflow-x:auto;scrollbar-width:none}
+    .breadcrumb::-webkit-scrollbar{display:none}
+    .bc-item{font-size:.7rem;color:var(--text2);white-space:nowrap}
+    .bc-sep{font-size:.65rem;color:var(--border);flex-shrink:0}
+    .bc-link{color:var(--blue);text-decoration:none;font-weight:700;font-size:.7rem;white-space:nowrap}
+    .bc-link:active{opacity:.7}
+    .bc-actions{display:flex;gap:.5rem;margin-right:auto}
+    .bc-action-btn{font-size:.68rem;font-weight:700;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.18rem .55rem;cursor:pointer;text-decoration:none;font-family:inherit;white-space:nowrap}
+    .bc-action-btn:active{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+    /* ── Quick Access ── */
+    .league-quick-access{display:flex;gap:10px;padding:10px 15px;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+    .league-quick-access::-webkit-scrollbar{display:none}
+    .qa-btn{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 12px;color:var(--text);text-decoration:none;font-size:0.8rem;font-weight:bold;white-space:nowrap;display:flex;align-items:center;gap:5px;flex-shrink:0}
+    .qa-btn:active{background:var(--blue);border-color:var(--blue);color:#fff}
+
+    /* ── Loading ── */
+    .loading{text-align:center;padding:3rem;color:var(--text2)}
+    .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <button class="back-btn" onclick="history.back()">→</button>
+  <h2 id="topBarTitle">تفاصيل المباراة</h2>
+</div>
+
+<div class="breadcrumb" id="breadcrumb" style="display:none"></div>
+
+<div id="root"><div class="loading"><div class="spinner"></div>جارٍ التحميل...</div></div>
+
+<script>
+const WORKER = 'https://football-worker.mahdijadir38.workers.dev';
+
+// ─── جدول تحويل معرفات ESPN إلى أكواد الدوريات ──────────────────────────────
+const ID_TO_CODE = {
+  // 🏴󠁧󠁢󠁥󠁮󠁧󠁿 إنجلترا
+  "23": "eng.1", "24": "eng.2", "25": "eng.3", "26": "eng.4", "27": "eng.5",
+  "28": "eng.league_cup", "29": "eng.fa", "30": "eng.community_shield",
+  
+  // 🇪🇸 إسبانيا
+  "15": "esp.1", "16": "esp.2", "17": "esp.copa_del_rey", 
+  "775": "esp.1", "776": "esp.1",
+  
+  // 🇩🇪 ألمانيا
+  "10": "ger.1", "11": "ger.2", "12": "ger.dfb_pokal",
+  
+  // 🇮🇹 إيطاليا
+  "13": "ita.1", "14": "ita.2", "18": "ita.coppa_italia",
+  
+  // 🇫🇷 فرنسا
+  "9": "fra.1", "102": "fra.2", "111": "fra.coupe_de_france",
+  
+  // 🇵🇹 البرتغال
+  "105": "por.1", "106": "por.2",
+  
+  // 🇳🇱 هولندا
+  "19": "ned.1",
+  
+  // 🏴󠁧󠁢󠁳󠁣󠁴󠁿 اسكتلندا
+  "44": "sco.1",
+  
+  // 🇧🇪 بلجيكا
+  "114": "bel.1",
+  
+  // 🇹🇷 تركيا
+  "71": "tur.1",
+  
+  // 🇨🇭 سويسرا
+  "122": "sui.1",
+  
+  // 🇦🇹 النمسا
+  "34": "aut.1",
+  
+  // 🇬🇷 اليونان
+  "67": "gre.1",
+  
+  // 🇷🇺 روسيا
+  "112": "rus.1",
+  
+  // 🇺🇦 أوكرانيا
+  "127": "ukr.1",
+  
+  // 🇨🇿 التشيك
+  "120": "cze.1",
+  
+  // 🇵🇱 بولندا
+  "121": "pol.1",
+  
+  // 🇭🇺 المجر
+  "126": "hun.1",
+  
+  // 🇷🇴 رومانيا
+  "108": "rou.1",
+  
+  // 🇧🇬 بلغاريا
+  "125": "bul.1",
+  
+  // 🇭🇷 كرواتيا
+  "124": "cro.1",
+  
+  // 🇸🇪 السويد
+  "116": "swe.1",
+  
+  // 🇳🇴 النرويج
+  "117": "nor.1",
+  
+  // 🇩🇰 الدنمارك
+  "119": "den.1",
+  
+  // 🇫🇮 فنلندا
+  "118": "fin.1",
+  
+  // 🇮🇪 أيرلندا
+  "113": "irl.1",
+  
+  // 🇮🇱 إسرائيل
+  "164": "isr.1",
+  
+  // 🌍 دوريات عربية
+  "181": "sau.1",   // 🇸🇦 السعودية
+  "234": "egy.1",   // 🇪🇬 مصر
+  "231": "mar.1",   // 🇲🇦 المغرب
+  "186": "uae.1",   // 🇦🇪 الإمارات
+  "190": "qat.1",   // 🇶🇦 قطر
+  "210": "irq.1",   // 🇮🇶 العراق
+  "206": "jor.1",   // 🇯🇴 الأردن
+  "233": "alg.1",   // 🇩🇿 الجزائر
+  "232": "tun.1",   // 🇹🇳 تونس
+  "194": "bhr.1",   // 🇧🇭 البحرين
+  "198": "omn.1",   // 🇴🇲 عمان
+  "202": "syr.1",   // 🇸🇾 سوريا
+  "214": "lbn.1",   // 🇱🇧 لبنان
+  "218": "kwt.1",   // 🇰🇼 الكويت
+  
+  // 🌎 أمريكا اللاتينية
+  "135": "bra.1",   // 🇧🇷 البرازيل
+  "80": "arg.1",    // 🇦🇷 الأرجنتين
+  "131": "mex.1",   // 🇲🇽 المكسيك
+  "21": "usa.1",    // 🇺🇸 الولايات المتحدة (MLS)
+  "137": "chi.1",   // 🇨🇱 تشيلي
+  "141": "col.1",   // 🇨🇴 كولومبيا
+  "143": "bol.1",   // 🇧🇴 بوليفيا
+  "147": "ecu.1",   // 🇪🇨 الإكوادور
+  "150": "par.1",   // 🇵🇾 باراغواي
+  "153": "per.1",   // 🇵🇪 بيرو
+  "156": "uru.1",   // 🇺🇾 الأوروغواي
+  "159": "ven.1",   // 🇻🇪 فنزويلا
+  
+  // 🌏 آسيا
+  "163": "jpn.1",   // 🇯🇵 اليابان
+  "167": "kor.1",   // 🇰🇷 كوريا الجنوبية
+  "171": "chn.1",   // 🇨🇳 الصين
+  "178": "tha.1",   // 🇹🇭 تايلاند
+  "179": "mas.1",   // 🇲🇾 ماليزيا
+  "180": "idn.1",   // 🇮🇩 إندونيسيا
+  "182": "vie.1",   // 🇻🇳 فيتنام
+  "166": "ind.1",   // 🇮🇳 الهند
+  
+  // 🌍 أفريقيا
+  "235": "rsa.1",   // 🇿🇦 جنوب أفريقيا
+  "236": "nga.1",   // 🇳🇬 نيجيريا
+  "237": "ken.1",   // 🇰🇪 كينيا
+  "238": "gha.1",   // 🇬🇭 غانا
+  "239": "tza.1",   // 🇹🇿 تنزانيا
+  "240": "uga.1",   // 🇺🇬 أوغندا
+  
+  // 🏆 بطولات قارية وعالمية
+  "2": "uefa.champions",      // دوري أبطال أوروبا
+  "3": "uefa.europa",         // الدوري الأوروبي
+  "2310": "uefa.conference",  // دوري المؤتمر الأوروبي
+  "73": "uefa.euro",          // يورو
+  "74": "uefa.euroq",         // تصفيات يورو
+  "606": "fifa.world",        // كأس العالم
+  "85": "fifa.worldq",        // تصفيات كأس العالم
+  "48": "caf.nations",        // كأس أمم أفريقيا
+  "49": "caf.nations_qual",   // تصفيات أمم أفريقيا
+  "84": "afc.asian.cup",      // كأس آسيا
+  "83": "conmebol.copa",      // كوبا أمريكا
+  "82": "conmebol.libertadores", // كوبا ليبرتادوريس
+  "81": "conmebol.sudamericana", // كوبا سودأمريكانا
+  "86": "concacaf.gold",      // كأس الكونكاكاف الذهبية
+  "2199": "afc.champions",    // دوري أبطال آسيا
+  "1975": "caf.champions",    // دوري أبطال أفريقيا
+  "1976": "caf.confed",       // كأس الكونفيدرالية الأفريقية
+  "2201": "concacaf.champions", // دوري أبطال الكونكاكاف
+  "2305": "uefa.nations",     // دوري الأمم الأوروبية
+};
+
+// ─── دالة شاملة للتعرف على الدوري من الاسم ──────────────────────────────────
+function detectLeagueFromName(leagueName) {
+  if (!leagueName) return null;
+  const n = leagueName.toLowerCase();
+  
+  // 🏴󠁧󠁢󠁥󠁮󠁧󠁿 إنجلترا
+  if (n.includes('premier league') || n.includes('england') || n.includes('english') || n.includes('premiership')) return 'eng.1';
+  if (n.includes('championship') || n.includes('efl championship')) return 'eng.2';
+  if (n.includes('league one')) return 'eng.3';
+  if (n.includes('league two')) return 'eng.4';
+  
+  // 🇪🇸 إسبانيا
+  if (n.includes('la liga') || n.includes('laliga') || n.includes('spain') || n.includes('spanish') || n.includes('liga bbva')) return 'esp.1';
+  
+  // 🇩🇪 ألمانيا
+  if (n.includes('bundesliga') || n.includes('germany') || n.includes('german') || n.includes('1. bundesliga')) return 'ger.1';
+  
+  // 🇮🇹 إيطاليا
+  if (n.includes('serie a') || n.includes('italy') || n.includes('italian') || n.includes('seriea')) return 'ita.1';
+  
+  // 🇫🇷 فرنسا
+  if (n.includes('ligue 1') || n.includes('france') || n.includes('french') || n.includes('ligue1')) return 'fra.1';
+  
+  // 🇵🇹 البرتغال
+  if (n.includes('primeira') || n.includes('portugal') || n.includes('portuguese')) return 'por.1';
+  
+  // 🇳🇱 هولندا
+  if (n.includes('eredivisie') || n.includes('dutch') || n.includes('netherlands')) return 'ned.1';
+  
+  // 🏴󠁧󠁢󠁳󠁣󠁴󠁿 اسكتلندا
+  if (n.includes('scottish') || n.includes('scotland') || n.includes('scottish premiership')) return 'sco.1';
+  
+  // 🇧🇪 بلجيكا
+  if (n.includes('belgian') || n.includes('belgium') || n.includes('pro league')) return 'bel.1';
+  
+  // 🇹🇷 تركيا
+  if (n.includes('turkish') || n.includes('turkey') || n.includes('super lig')) return 'tur.1';
+  
+  // 🇨🇭 سويسرا
+  if (n.includes('swiss') || n.includes('switzerland') || n.includes('super league')) return 'sui.1';
+  
+  // 🇦🇹 النمسا
+  if (n.includes('austrian') || n.includes('austria') || n.includes('bundesliga austria')) return 'aut.1';
+  
+  // 🇬🇷 اليونان
+  if (n.includes('greek') || n.includes('greece') || n.includes('super league greece')) return 'gre.1';
+  
+  // 🇸🇦 السعودية
+  if (n.includes('saudi') || n.includes('ksa') || n.includes('roshen') || n.includes('dawri')) return 'sau.1';
+  
+  // 🇪🇬 مصر
+  if (n.includes('egypt') || n.includes('egyptian') || n.includes('premier league egypt') || n.includes('we')) return 'egy.1';
+  
+  // 🇲🇦 المغرب
+  if (n.includes('morocco') || n.includes('moroccan') || n.includes('botola') || n.includes('inwi')) return 'mar.1';
+  
+  // 🇦🇪 الإمارات
+  if (n.includes('uae') || n.includes('emirates') || n.includes('adnoc') || n.includes('arabian gulf')) return 'uae.1';
+  
+  // 🇶🇦 قطر
+  if (n.includes('qatar') || n.includes('qatari') || n.includes('qatar stars') || n.includes('qsl')) return 'qat.1';
+  
+  // 🇮🇶 العراق
+  if (n.includes('iraq') || n.includes('iraqi') || n.includes('dawri al-iraqi')) return 'irq.1';
+  
+  // 🇯🇴 الأردن
+  if (n.includes('jordan') || n.includes('jordanian') || n.includes('jordan pro')) return 'jor.1';
+  
+  // 🇩🇿 الجزائر
+  if (n.includes('algeria') || n.includes('algerian') || n.includes('ligue 1 algeria') || n.includes('lpf')) return 'alg.1';
+  
+  // 🇹🇳 تونس
+  if (n.includes('tunisia') || n.includes('tunisian') || n.includes('clp') || n.includes('ligue 1 tunisia')) return 'tun.1';
+  
+  // 🇧🇭 البحرين
+  if (n.includes('bahrain') || n.includes('bahr')) return 'bhr.1';
+  
+  // 🇴🇲 عمان
+  if (n.includes('oman') || n.includes('omani')) return 'omn.1';
+  
+  // 🇸🇾 سوريا
+  if (n.includes('syria') || n.includes('syrian')) return 'syr.1';
+  
+  // 🇱🇧 لبنان
+  if (n.includes('lebanon') || n.includes('lebanese')) return 'lbn.1';
+  
+  // 🇰🇼 الكويت
+  if (n.includes('kuwait') || n.includes('kuwaiti')) return 'kwt.1';
+  
+  // 🇧🇷 البرازيل
+  if (n.includes('brasileiro') || n.includes('brazil') || n.includes('serie a brazil') || n.includes('campeonato brasileiro')) return 'bra.1';
+  
+  // 🇦🇷 الأرجنتين
+  if (n.includes('argentina') || n.includes('argentinian') || n.includes('liga profesional') || n.includes('primera division argentina')) return 'arg.1';
+  
+  // 🇲🇽 المكسيك
+  if (n.includes('mexico') || n.includes('mexican') || n.includes('liga mx')) return 'mex.1';
+  
+  // 🇺🇸 الولايات المتحدة
+  if (n.includes('mls') || n.includes('major league soccer') || n.includes('usa soccer')) return 'usa.1';
+  
+  // 🇨🇱 تشيلي
+  if (n.includes('chile') || n.includes('chilean')) return 'chi.1';
+  
+  // 🇨🇴 كولومبيا
+  if (n.includes('colombia') || n.includes('colombian')) return 'col.1';
+  
+  // 🇧🇴 بوليفيا
+  if (n.includes('bolivia') || n.includes('bolivian')) return 'bol.1';
+  
+  // 🇪🇨 الإكوادور
+  if (n.includes('ecuador') || n.includes('ecuadorian')) return 'ecu.1';
+  
+  // 🇵🇾 باراغواي
+  if (n.includes('paraguay') || n.includes('paraguayan')) return 'par.1';
+  
+  // 🇵🇪 بيرو
+  if (n.includes('peru') || n.includes('peruvian')) return 'per.1';
+  
+  // 🇺🇾 الأوروغواي
+  if (n.includes('uruguay') || n.includes('uruguayan')) return 'uru.1';
+  
+  // 🇻🇪 فنزويلا
+  if (n.includes('venezuela') || n.includes('venezuelan')) return 'ven.1';
+  
+  // 🇯🇵 اليابان
+  if (n.includes('japan') || n.includes('japanese') || n.includes('j1 league') || n.includes('j.league')) return 'jpn.1';
+  
+  // 🇰🇷 كوريا
+  if (n.includes('korea') || n.includes('korean') || n.includes('k league') || n.includes('kleague')) return 'kor.1';
+  
+  // 🇨🇳 الصين
+  if (n.includes('china') || n.includes('chinese') || n.includes('csl') || n.includes('super league china')) return 'chn.1';
+  
+  // 🇹🇭 تايلاند
+  if (n.includes('thailand') || n.includes('thai')) return 'tha.1';
+  
+  // 🇲🇾 ماليزيا
+  if (n.includes('malaysia') || n.includes('malaysian')) return 'mas.1';
+  
+  // 🇮🇩 إندونيسيا
+  if (n.includes('indonesia') || n.includes('indonesian')) return 'idn.1';
+  
+  // 🇻🇳 فيتنام
+  if (n.includes('vietnam') || n.includes('vietnamese')) return 'vie.1';
+  
+  // 🇮🇳 الهند
+  if (n.includes('india') || n.includes('indian super league') || n.includes('isl')) return 'ind.1';
+  
+  // 🇿🇦 جنوب أفريقيا
+  if (n.includes('south africa') || n.includes('south african') || n.includes('psl')) return 'rsa.1';
+  
+  // 🇳🇬 نيجيريا
+  if (n.includes('nigeria') || n.includes('nigerian')) return 'nga.1';
+  
+  // 🇰🇪 كينيا
+  if (n.includes('kenya') || n.includes('kenyan')) return 'ken.1';
+  
+  // 🇬🇭 غانا
+  if (n.includes('ghana') || n.includes('ghanaian')) return 'gha.1';
+  
+  // 🇹🇿 تنزانيا
+  if (n.includes('tanzania') || n.includes('tanzanian')) return 'tza.1';
+  
+  // 🇺🇬 أوغندا
+  if (n.includes('uganda') || n.includes('ugandan')) return 'uga.1';
+  
+  // 🏆 بطولات قارية وعالمية
+  if (n.includes('champions league') || n.includes('ucl') || n.includes('uefa champions')) return 'uefa.champions';
+  if (n.includes('europa league') || n.includes('uel') || n.includes('uefa europa')) return 'uefa.europa';
+  if (n.includes('conference') || n.includes('uecl') || n.includes('uefa conference')) return 'uefa.conference';
+  if (n.includes('world cup') || n.includes('fifa world cup') || n.includes('fifa world')) return 'fifa.world';
+  if (n.includes('world cup qual') || n.includes('world cup qualification') || n.includes('fifa world cup qualification')) return 'fifa.worldq';
+  if (n.includes('euro') || n.includes('uefa euro') || n.includes('european championship')) return 'uefa.euro';
+  if (n.includes('euro qual') || n.includes('uefa euro qual')) return 'uefa.euroq';
+  if (n.includes('africa cup') || n.includes('caf') || n.includes('nations cup') || n.includes('afcon')) return 'caf.nations';
+  if (n.includes('africa cup qual') || n.includes('caf qual')) return 'caf.nations_qual';
+  if (n.includes('asia cup') || n.includes('afc asian') || n.includes('asian cup')) return 'afc.asian.cup';
+  if (n.includes('copa america') || n.includes('conmebol copa')) return 'conmebol.copa';
+  if (n.includes('libertadores') || n.includes('copa libertadores')) return 'conmebol.libertadores';
+  if (n.includes('sudamericana') || n.includes('copa sudamericana')) return 'conmebol.sudamericana';
+  if (n.includes('gold cup') || n.includes('concacaf gold')) return 'concacaf.gold';
+  if (n.includes('afc champions') || n.includes('asian champions')) return 'afc.champions';
+  if (n.includes('caf champions') || n.includes('africa champions')) return 'caf.champions';
+  if (n.includes('caf confederation') || n.includes('confed')) return 'caf.confed';
+  if (n.includes('concacaf champions')) return 'concacaf.champions';
+  if (n.includes('uefa nations') || n.includes('nations league')) return 'uefa.nations';
+  
+  return null;
+}
+
+/* ═══ تنسيق الوقت ═══════════════════════════════════════════════════════════ */
+function formatTime(minute) {
+  if (!minute) return '??';
+  let clean = String(minute).replace(/[^0-9+]/g, '');
+  if (clean.includes('+')) {
+    const parts = clean.split('+');
+    return `${parts[0]||'0'}+${parts[1]||'0'}`;
+  }
+  return clean || '??';
+}
+
+/* ═══ POSITION CATEGORY ═════════════════════════════════════════════ */
+function posCat(abbr) {
+  const b = (abbr || '').toUpperCase().split('-')[0].split(' ')[0];
+  if (['G','GK'].includes(b)) return 'gk';
+  if (['CB','CD','LCB','RCB','LB','RB','LWB','RWB','SW','DC','DL','DR','D'].includes(b)) return 'def';
+  if (['ST','CF','FW','LW','RW','SS','FO','ATT','LF','RF','FWD'].includes(b)) return 'fwd';
+  return 'mid';
+}
+
+/* ═══ JERSEY SVG ════════════════════════════════════════════════════ */
+function shade(hex, p) {
+  try {
+    let c = hex.replace('#','');
+    if (c.length===3) c=c.split('').map(x=>x+x).join('');
+    const n=parseInt(c,16);
+    const r=Math.min(255,Math.max(0,((n>>16)&255)+p));
+    const g=Math.min(255,Math.max(0,((n>>8)&255)+p));
+    const b=Math.min(255,Math.max(0,(n&255)+p));
+    return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+  } catch(e){return hex}
+}
+function jersey(num, isGK, color) {
+  const fill  = isGK ? '#555' : color;
+  const dark  = shade(fill, -28);
+  const s     = String(num||'?');
+  const fs    = s.length > 2 ? '8' : s.length > 1 ? '11' : '13';
+  return `<svg viewBox="0 0 44 42" width="40" height="37" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8,3 L0,13 L8,17.5 L8,39 L36,39 L36,17.5 L44,13 L36,3 Q29,9 22,9 Q15,9 8,3 Z" fill="${fill}"/>
+    <path d="M8,3 L8,17.5 L12,19.5 Q22,23 32,19.5 L36,17.5 L36,3 Q29,9 22,9 Q15,9 8,3 Z" fill="${dark}" opacity=".22"/>
+    <path d="M15.5,4 Q22,11 28.5,4" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+    <text x="22" y="30" text-anchor="middle" fill="white" font-size="${fs}px" font-weight="900" font-family="Arial,sans-serif">${s}</text>
+  </svg>`;
+}
+
+/* ═══ BUILD ROWS FOR PITCH ══════════════════════════════════════════ */
+function buildRows(starters, formation) {
+  const gks = starters.filter(p => posCat(p.position) === 'gk');
+  const out  = starters.filter(p => posCat(p.position) !== 'gk');
+  const nums = (formation||'').split('-').map(Number).filter(n=>n>0);
+  if (nums.length && nums.reduce((a,b)=>a+b,0) === out.length) {
+    const rows=[]; let i=0;
+    nums.forEach(n=>{rows.push(out.slice(i,i+n));i+=n;});
+    return [gks,...rows];
+  }
+  const def=out.filter(p=>posCat(p.position)==='def');
+  const mid=out.filter(p=>posCat(p.position)==='mid');
+  const fwd=out.filter(p=>posCat(p.position)==='fwd');
+  return [gks,def,mid,fwd].filter(r=>r.length);
+}
+
+/* ═══ RENDER PITCH ══════════════════════════════════════════════════ */
+function renderPitch(lineup, formation, color, cards) {
+  const el = document.getElementById('pitch-players');
+  if (!el) return;
+  const yellowSet = new Set((cards||[]).filter(c=>c.type==='yellowCard').map(c=>c.player));
+  const redSet    = new Set((cards||[]).filter(c=>c.type==='redCard'||c.type==='yellowRedCard').map(c=>c.player));
+  const starters  = lineup.filter(p=>p.starter);
+  const rows      = buildRows(starters, formation);
+  el.innerHTML    = '';
+  ;[...rows].reverse().forEach(row => {
+    if (!row.length) return;
+    const div = document.createElement('div');
+    div.className = 'pitch-row';
+    row.forEach(p => {
+      const gk = posCat(p.position)==='gk';
+      let badges = '';
+      if (redSet.has(p.name))         badges += '<span class="p-badge badge-rc">🟥</span>';
+      else if (yellowSet.has(p.name)) badges += '<span class="p-badge badge-yc">🟨</span>';
+      if (p.subbedOut) badges += '<span class="p-badge badge-sout" style="left:-7px;right:auto">▼</span>';
+      if (p.subbedIn)  badges += '<span class="p-badge badge-sin" style="left:-7px;right:auto">▲</span>';
+      const tag = p.shortName || p.name.split(' ').slice(-1)[0] || p.name;
+      div.innerHTML += `<div class="player-item">
+        <div class="jersey-wrap">${jersey(p.jersey,gk,color)}${badges}</div>
+        <div class="player-tag">${tag}</div>
+      </div>`;
+    });
+    el.appendChild(div);
+  });
+}
+
+/* ═══ RENDER BENCH & SUBS ═══════════════════════════════════════════ */
+function renderSubs(subsEvents, lineup, elId) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+
+  const bench = (lineup || []).filter(p => p.starter === false);
+
+  if (!bench.length && !subsEvents?.length) {
+    el.innerHTML = '<div class="no-events">لا توجد قائمة للبدلاء</div>';
+    return;
+  }
+
+  let html = '';
+
+  const subMap = {};
+  (subsEvents || []).forEach(s => {
+    if (s.playerIn) {
+      subMap[s.playerIn.toLowerCase().trim()] = s;
+    }
+  });
+
+  bench.forEach(p => {
+    const pName   = p.name || '—';
+    const pJersey = p.jersey ? `${p.jersey}` : '';
+
+    let subInfo = '';
+    const normName = pName.toLowerCase().trim();
+    let subEvent = subMap[normName];
+
+    if (!subEvent) {
+      const parts    = normName.split(' ');
+      const lastName = parts[parts.length - 1];
+      for (const key in subMap) {
+        if (key.includes(lastName) || normName.includes(key.split(' ')[0])) {
+          subEvent = subMap[key];
+          break;
+        }
+      }
+    }
+
+    if (subEvent) {
+      subInfo = `
+        <div style="font-size:0.75rem;color:var(--text2);display:flex;align-items:center;gap:5px;margin-top:2px;">
+          <span style="color:#81D6AC;font-weight:bold;">${subEvent.minute ? subEvent.minute.replace("'","")+"'" : ''}</span>
+          <span style="color:#81D6AC;">▲</span>
+          <span>خارج: ${subEvent.playerOut}</span>
+        </div>`;
+    }
+
+    html += `
+    <div class="sub-row" style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--border);background:var(--bg2);">
+      <div style="display:flex;align-items:center;gap:10px;"></div>
+      <div style="display:flex;align-items:center;gap:12px;text-align:right;">
+        <div style="display:flex;flex-direction:column;align-items:flex-end;">
+          <div style="display:flex;align-items:center;gap:5px;">
+            ${pJersey ? `<span>${pJersey}</span>` : ''}
+            <span style="font-weight:bold;">${pName}</span>
+          </div>
+          ${subInfo}
+        </div>
+        <div style="width:36px;height:36px;border-radius:50%;background:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid #eee;">
+          <img src="https://a.espncdn.com/i/headshots/soccer/players/full/default.png" style="width:100%;height:auto;" onerror="this.style.display='none'">
+        </div>
+      </div>
+    </div>`;
+  });
+
+  const renderedInNames = bench.map(b => b.name.toLowerCase().trim());
+  (subsEvents || []).forEach(s => {
+    if (s.playerIn && !renderedInNames.some(name => name.includes(s.playerIn.toLowerCase().trim().split(' ')[0]))) {
+      html += `
+      <div class="sub-row" style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid var(--border);background:var(--bg2);">
+        <div style="display:flex;align-items:center;gap:10px;"></div>
+        <div style="display:flex;align-items:center;gap:12px;text-align:right;">
+          <div style="display:flex;flex-direction:column;align-items:flex-end;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              ${s.jerseyIn ? `<span>${s.jerseyIn}</span>` : ''}
+              <span style="font-weight:bold;">${s.playerIn}</span>
+            </div>
+            <div style="font-size:0.75rem;color:var(--text2);display:flex;align-items:center;gap:5px;margin-top:2px;">
+              <span style="color:#81D6AC;font-weight:bold;">${s.minute ? s.minute.replace("'","")+"'" : ''}</span>
+              <span style="color:#81D6AC;">▲</span>
+              <span>خارج: ${s.playerOut}</span>
+            </div>
+          </div>
+          <div style="width:36px;height:36px;border-radius:50%;background:#fff;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid #eee;">
+            <img src="https://a.espncdn.com/i/headshots/soccer/players/full/default.png" style="width:100%;height:auto;">
+          </div>
+        </div>
+      </div>`;
+    }
+  });
+
+  el.innerHTML = html;
+}
+
+/* ═══ GOAL TYPE BADGE ═══════════════════════════════════════════════ */
+function goalBadge(type) {
+  if (type === 'penalty') return '<span class="ev-badge badge-pk">ر.جزاء</span>';
+  if (type === 'ownGoal') return '<span class="ev-badge badge-og">هدف عكسي</span>';
+  return '';
+}
+
+/* ═══ GOAL SCORER LINE (under team logo) ════════════════════════════ */
+function scorerLine(g) {
+  const ogTag  = g.type === 'ownGoal'  ? ' <span class="og-tag">(هدف عكسي)</span>' : '';
+  const penTag = g.type === 'penalty'  ? ' <span class="og-tag">(ر.ج)</span>'      : '';
+  return `<div class="hero-scorer">
+    ⚽ ${g.player||''}${ogTag}${penTag}<span class="smin">${formatTime(g.minute)}'</span>
+  </div>`;
+}
+
+/* ═══ GLOBAL STATE ════════════════════════════════════════════════════ */
+let G = null;
+let evFilter = 'all';
+
+function showTeam(side) {
+  if (!G) return;
+  const isHome = side === 'home';
+  document.getElementById('btn-home').classList.toggle('active', isHome);
+  document.getElementById('btn-away').classList.toggle('active', !isHome);
+  renderPitch(
+    isHome ? G.homeLineup : G.awayLineup,
+    isHome ? G.homeFormation : G.awayFormation,
+    isHome ? '#3b82f6' : '#ef4444',
+    G.cards
+  );
+  renderSubs(isHome ? G.homeSubs : G.awaySubs, isHome ? G.homeLineup : G.awayLineup, 'subs-list');
+}
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function setEvFilter(f, btn) {
+  evFilter = f;
+  document.querySelectorAll('.ev-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTimeline();
+}
+
+/* ═══ COMBINED EVENTS TIMELINE ═══════════════════════════════════════ */
+function renderTimeline() {
+  const el = document.getElementById('ev-timeline');
+  if (!el || !G) return;
+
+  const goals = (G.goals||[]).map(g => ({ ...g, _type: 'goal' }));
+  const cards = (G.cards||[]).map(c => ({ ...c, _type: 'card' }));
+  const subs  = (G.subs ||[]).map(s => ({ ...s, _type: 'sub' }));
+
+  let events = [];
+  if (evFilter === 'all')   events = [...goals, ...cards, ...subs];
+  if (evFilter === 'goals') events = goals;
+  if (evFilter === 'cards') events = cards;
+  if (evFilter === 'subs')  events = subs;
+
+  events.sort((a,b) => (parseInt(a.minute)||0) - (parseInt(b.minute)||0));
+
+  if (!events.length) {
+    el.innerHTML = '<div class="no-events">لا توجد أحداث</div>';
+    return;
+  }
+
+  el.innerHTML = events.map(ev => {
+    if (ev._type === 'goal') {
+      return `<div class="ev-row">
+        <span class="ev-min">${formatTime(ev.minute)}'</span>
+        <span class="ev-icon">⚽</span>
+        <div class="ev-body">
+          <div class="ev-player">${ev.player||'—'}</div>
+          <div class="ev-meta">
+            <span class="ev-team">${ev.team||''}</span>
+            ${goalBadge(ev.type)}
+            ${ev.assist ? `<span class="ev-assist">🅰️ ${ev.assist}</span>` : ''}
+          </div>
+        </div>
+      </div>`;
+    }
+    if (ev._type === 'card') {
+      const icon = ev.type === 'redCard' ? '🟥' : ev.type === 'yellowRedCard' ? '🟥🟨' : '🟨';
+      return `<div class="ev-row">
+        <span class="ev-min">${formatTime(ev.minute)}'</span>
+        <span class="ev-icon">${icon}</span>
+        <div class="ev-body">
+          <div class="ev-player">${ev.player||'—'}</div>
+          <div class="ev-meta"><span class="ev-team">${ev.team||''}</span></div>
+        </div>
+      </div>`;
+    }
+    if (ev._type === 'sub') {
+      return `<div class="ev-row">
+        <span class="ev-min">${formatTime(ev.minute)}'</span>
+        <span class="ev-icon">🔄</span>
+        <div class="ev-sub-pair">
+          <div class="ev-sub-in">▲ <span class="ev-jno">#${ev.jerseyIn||'?'}</span> ${ev.playerIn||'—'}</div>
+          <div class="ev-sub-out">▼ <span class="ev-jno">#${ev.jerseyOut||'?'}</span> ${ev.playerOut||'—'}</div>
+          ${ev.team ? `<div style="font-size:.65rem;color:var(--text2);margin-top:.1rem">${ev.team}</div>` : ''}
+        </div>
+      </div>`;
+    }
+    return '';
+  }).join('');
+}
+
+/* ═══ MAIN LOAD ══════════════════════════════════════════════════════ */
+async function loadMatch() {
+  const p = new URLSearchParams(location.search);
+  const id = p.get('id');
+  const league = p.get('league') || '';
+  
+  // التحقق من وجود id
+  if (!id) {
+    document.getElementById('root').innerHTML = '<div class="loading">❌ معرف المباراة غير موجود</div>';
+    return;
+  }
+  
+  console.log('🔍 Loading match:', id, 'league:', league);
+  
+  try {
+    // إرسال الطلب مع matchId و league
+    const res = await fetch(`${WORKER}/api/summary?matchId=${id}&league=${league}`);
+    const data = await res.json();
+    
+    if (!data || data.error) {
+      throw new Error(data?.error || 'فشل التحميل');
+    }
+    
+    G = data;
+    render(data);
+  } catch(e) {
+    console.error(e);
+    document.getElementById('root').innerHTML = `<div class="loading">❌ ${e.message}</div>`;
+  }
+}
+
+/* ═══ RENDER ══════════════════════════════════════════════════════════ */
+function render(d) {
+  const isLive = d.status === 'in';
+  const isPre  = d.status === 'pre';
+
+  // ─── تحديد كود الدوري بشكل صحيح ──────────────────────────────────────
+  let lgForLinks = '';
+
+  // 1. من معرّف الدوري في URL
+  const urlLeague = new URLSearchParams(window.location.search).get('league');
+  
+  // 2. إذا كان الرقم موجوداً في جدول التحويل
+  if (urlLeague && !isNaN(urlLeague) && ID_TO_CODE[urlLeague]) {
+    lgForLinks = ID_TO_CODE[urlLeague];
+  }
+  // 3. من d.league (قد يكون رقم أو كود)
+  else if (d.league) {
+    if (!isNaN(d.league) && ID_TO_CODE[d.league]) {
+      lgForLinks = ID_TO_CODE[d.league];
+    } else if (d.league.includes('.') && !d.league.includes(' ')) {
+      lgForLinks = d.league;
+    }
+  }
+  // 4. من d.leagueId
+  else if (d.leagueId && !isNaN(d.leagueId) && ID_TO_CODE[d.leagueId]) {
+    lgForLinks = ID_TO_CODE[d.leagueId];
+  }
+  // 5. من اسم الدوري (الأكثر شمولاً)
+  else if (d.leagueName) {
+    const detected = detectLeagueFromName(d.leagueName);
+    if (detected) lgForLinks = detected;
+  }
+  // 6. من leagueNameOnly
+  else if (d.leagueNameOnly) {
+    const detected = detectLeagueFromName(d.leagueNameOnly);
+    if (detected) lgForLinks = detected;
+  }
+  // 7. محاولة التعرف من اسم الفريق (كحل أخير)
+  if (!lgForLinks) {
+    const teamName = (d.homeTeam || '').toLowerCase();
+    if (teamName.includes('real madrid') || teamName.includes('barcelona') || teamName.includes('atletico') || teamName.includes('athletic')) {
+      lgForLinks = 'esp.1';
+    } else if (teamName.includes('manchester') || teamName.includes('liverpool') || teamName.includes('arsenal') || teamName.includes('chelsea') || teamName.includes('tottenham') || teamName.includes('newcastle')) {
+      lgForLinks = 'eng.1';
+    } else if (teamName.includes('bayern') || teamName.includes('dortmund') || teamName.includes('leverkusen') || teamName.includes('schalke')) {
+      lgForLinks = 'ger.1';
+    } else if (teamName.includes('juventus') || teamName.includes('milan') || teamName.includes('inter') || teamName.includes('napoli') || teamName.includes('roma')) {
+      lgForLinks = 'ita.1';
+    } else if (teamName.includes('psg') || teamName.includes('marseille') || teamName.includes('lyon') || teamName.includes('monaco')) {
+      lgForLinks = 'fra.1';
+    } else if (teamName.includes('al-hilal') || teamName.includes('al-nassr') || teamName.includes('al-ittihad') || teamName.includes('al-ahli') || teamName.includes('al-shabab')) {
+      lgForLinks = 'sau.1';
+    } else if (teamName.includes('al-ahly') || teamName.includes('zamalek') || teamName.includes('pyramids') || teamName.includes('al-masry')) {
+      lgForLinks = 'egy.1';
+    } else if (teamName.includes('wydad') || teamName.includes('raja') || teamName.includes('fes') || teamName.includes('meknes')) {
+      lgForLinks = 'mar.1';
+    }
+  }
+  // 8. افتراض الدوري الإنجليزي إذا لم يتم التعرف على أي شيء
+  if (!lgForLinks) {
+    lgForLinks = 'eng.1';
+  }
+
+  console.log('🔍 League detected:', lgForLinks, 'from:', d.leagueName || d.league || 'unknown');
+
+  // ─── بناء HTML ──────────────────────────────────────────────────────────
+  const scoreHtml = isPre
+    ? `<span style="font-size:1rem;color:var(--text2)">vs</span>`
+    : `<div class="hero-score${isLive?' live':''}">${d.homeScore??0} - ${d.awayScore??0}</div>`;
+
+  const shootoutHtml = (d.homeShootout != null && d.awayShootout != null)
+    ? `<div class="hero-shootout">(${d.homeShootout} - ${d.awayShootout} ر.ت)</div>` : '';
+
+  const isHalfTime = d.isHalfTime || (isLive && (
+    (d.statusText||'').toLowerCase().includes('half') ||
+    (d.statusText||'').toLowerCase().includes('ht')
+  ));
+
+  const statusHtml = isPre
+    ? '⏱️ لم تبدأ'
+    : isHalfTime
+      ? `<span class="live-pill" style="background:var(--yellow);color:#000">⏸️ استراحة</span>`
+      : isLive
+        ? `<span class="live-pill">🔴 ${d.minute||'LIVE'}</span>`
+        : `✅ ${d.statusText||'انتهت'}`;
+
+  const advancesHtml = d.advancesNote
+    ? `<div class="advances-bar">🏆 ${d.advancesNote}</div>` : '';
+
+  const quickAccessHtml = `
+    <div class="league-quick-access">
+      <a class="qa-btn" href="league.html?league=${encodeURIComponent(lgForLinks)}&tab=standings">
+        <span>🏆</span> الترتيب
+      </a>
+      <a class="qa-btn" href="league.html?league=${encodeURIComponent(lgForLinks)}&tab=scorers">
+        <span>⚽</span> الهدافين
+      </a>
+      <a class="qa-btn" href="league.html?league=${encodeURIComponent(lgForLinks)}&tab=matches">
+        <span>📅</span> المباريات
+      </a>
+    </div>`;
+
+  const venueHtml = d.venue
+    ? `<div class="hero-venue">🏟️ ${d.venue}</div>` : '';
+
+  let fixedLeagueName = d.leagueName || '';
+  if (fixedLeagueName.toLowerCase().includes('austri') && fixedLeagueName.includes('🇩🇪')) {
+    fixedLeagueName = fixedLeagueName.replace('🇩🇪', '🇦🇹');
+  }
+  const leagueDisplay = [fixedLeagueName, d.leagueGroup].filter(Boolean).join(' · ');
+
+  const allGoals   = d.goals || [];
+  const homeGoals  = allGoals.filter(g => g.team === d.homeTeam);
+  const awayGoals  = allGoals.filter(g => g.team === d.awayTeam);
+
+  const homeScorersHtml = homeGoals.length
+    ? `<div class="hero-scorers">${homeGoals.map(scorerLine).join('')}</div>` : '';
+  const awayScorersHtml = awayGoals.length
+    ? `<div class="hero-scorers">${awayGoals.map(scorerLine).join('')}</div>` : '';
+
+  const fmHome = d.homeFormation ? ` (${d.homeFormation})` : '';
+  const fmAway = d.awayFormation ? ` (${d.awayFormation})` : '';
+
+  const statsHtml = (d.homeStats||[]).length
+    ? d.homeStats.map((s,i) => {
+        const as = d.awayStats?.[i];
+        const hv = parseFloat(s.value)||0, av = parseFloat(as?.value)||0;
+        const tot = hv+av||1, hp = Math.round(hv/tot*100);
+        return `<div class="stat-item">
+          <div class="stat-row">
+            <span class="stat-h">${s.value}</span>
+            <span class="stat-n">${s.name}</span>
+            <span class="stat-a">${as?.value||'-'}</span>
+          </div>
+          <div class="bar"><div class="bar-h" style="width:${hp}%"></div></div>
+          <div class="bar"><div class="bar-a" style="width:${100-hp}%"></div></div>
+        </div>`;
+      }).join('')
+    : '<div class="no-events">لا توجد إحصائيات</div>';
+
+  // ─── Breadcrumb ──
+  const bcEl = document.getElementById('breadcrumb');
+  const leagueShort = d.leagueNameOnly || d.leagueName || lgForLinks || 'البطولة';
+  bcEl.innerHTML = `
+    <a class="bc-link" href="index.html">⚽ المباريات</a>
+    <span class="bc-sep">›</span>
+    <a class="bc-link" href="league.html?league=${encodeURIComponent(lgForLinks)}">${leagueShort}</a>
+    <span class="bc-sep">›</span>
+    <span class="bc-item">${d.homeTeam} vs ${d.awayTeam}</span>
+    <div class="bc-actions">
+      <a class="bc-action-btn" href="league.html?league=${encodeURIComponent(lgForLinks)}&tab=standings">🏆 الترتيب</a>
+      <a class="bc-action-btn" href="league.html?league=${encodeURIComponent(lgForLinks)}&tab=scorers">⚽ الهدافون</a>
+    </div>`;
+  bcEl.style.display = 'flex';
+
+  // ─── Main HTML ──
+  document.getElementById('root').innerHTML = `
+    ${quickAccessHtml}
+    <div class="hero">
+      <div class="hero-league">
+        <a href="league.html?league=${encodeURIComponent(lgForLinks)}" style="color:var(--text2);text-decoration:none;display:flex;align-items:center;justify-content:center;gap:5px;">
+          <span>${leagueDisplay||''}</span><span style="font-size:10px;">🏆</span>
+        </a>
+      </div>
+      <div class="hero-teams">
+        <div class="hero-team">
+          ${d.homeLogo ? `<img class="hero-logo" src="${d.homeLogo}" onerror="this.style.display='none'">` : '<div style="height:54px"></div>'}
+          <div class="hero-name">${d.homeTeam}</div>
+          ${homeScorersHtml}
+        </div>
+        <div class="hero-center">
+          ${scoreHtml}
+          ${shootoutHtml}
+          <div class="hero-status">${statusHtml}</div>
+        </div>
+        <div class="hero-team">
+          ${d.awayLogo ? `<img class="hero-logo" src="${d.awayLogo}" onerror="this.style.display='none'">` : '<div style="height:54px"></div>'}
+          <div class="hero-name">${d.awayTeam}</div>
+          ${awayScorersHtml}
+        </div>
+      </div>
+      ${venueHtml}
+      ${advancesHtml}
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('events',this)">📋 الأحداث</button>
+      <button class="tab" onclick="switchTab('lineup',this)">👕 التشكيلة</button>
+      <button class="tab" onclick="switchTab('stats',this)">📊 إحصائيات</button>
+    </div>
+
+    <div class="tab-panel active" id="panel-events">
+      <div class="ev-filter-bar">
+        <button class="ev-filter active" onclick="setEvFilter('all',this)">📋 الكل</button>
+        <button class="ev-filter" onclick="setEvFilter('goals',this)">⚽ الأهداف</button>
+        <button class="ev-filter" onclick="setEvFilter('cards',this)">🟨 البطاقات</button>
+        <button class="ev-filter" onclick="setEvFilter('subs',this)">🔄 التبديلات</button>
+      </div>
+      <div class="ev-timeline" id="ev-timeline"></div>
+    </div>
+
+    <div class="tab-panel" id="panel-lineup">
+      <div class="fm-switcher">
+        <button class="fm-btn active" id="btn-home" onclick="showTeam('home')">
+          🔵 ${d.homeTeam}${fmHome}
+        </button>
+        <button class="fm-btn" id="btn-away" onclick="showTeam('away')">
+          🔴 ${d.awayTeam}${fmAway}
+        </button>
+      </div>
+      <div class="pitch-wrap">
+        <div class="pitch">
+          <div class="p-box-t"></div>
+          <div class="p-line"></div>
+          <div class="p-circle"></div>
+          <div class="p-dot"></div>
+          <div class="p-box-b"></div>
+          <div id="pitch-players" style="display:flex;flex-direction:column;gap:10px;position:relative;z-index:1;flex:1"></div>
+        </div>
+      </div>
+      <div class="subs-section">
+        <div class="sec-label"><span>🔄 التبديلات</span></div>
+        <div id="subs-list"></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="panel-stats">
+      <div class="sec-label" style="display:flex;justify-content:space-between">
+        <span style="color:var(--blue)">${d.homeTeam}</span>
+        <span></span>
+        <span style="color:var(--red)">${d.awayTeam}</span>
+      </div>
+      ${statsHtml}
+    </div>
+  `;
+
+  requestAnimationFrame(() => {
+    renderTimeline();
+    showTeam('home');
+  });
+}
+
+// ═══ START ══════════════════════════════════════════════════════════
+document.addEventListener("DOMContentLoaded", loadMatch);
+</script>
+</body>
+</html>
